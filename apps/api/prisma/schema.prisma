@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String      @id @default(uuid()) @db.Uuid
+  name         String
+  email        String      @unique
+  passwordHash String
+  links        ShortLink[]
+
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@map("users")
+}
+
+model ShortLink {
+  id           String            @id @default(uuid()) @db.Uuid
+  userId       String            @db.Uuid
+  user         User              @relation(fields: [userId], references: [id])
+
+  originalUrl  String
+  shortCode    String            @unique
+  customAlias  String?           @unique
+  title        String?
+  description  String?
+
+  active       Boolean           @default(true)
+  expiresAt    DateTime?
+  maxClicks    Int?
+  clickCount   Int               @default(0)
+
+  accessEvents LinkAccessEvent[]
+
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  deletedAt    DateTime?
+
+  @@index([userId, deletedAt])
+  @@index([userId, createdAt])
+  @@index([createdAt])
+  @@map("short_links")
+}
+
+model LinkAccessEvent {
+  id          String    @id @default(uuid()) @db.Uuid
+  shortLinkId String    @db.Uuid
+  shortLink   ShortLink @relation(fields: [shortLinkId], references: [id])
+
+  accessedAt  DateTime  @default(now())
+  ipAddress   String?
+  userAgent   String?
+  referer      String?
+
+  @@index([shortLinkId, accessedAt])
+  @@index([accessedAt])
+  @@map("link_access_events")
+}

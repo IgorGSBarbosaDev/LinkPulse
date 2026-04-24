@@ -1,0 +1,22 @@
+node_modules
+
+# Keep environment variables out of version control
+.env
+.env.*
+!.env.example
+
+# Build and runtime artifacts
+dist
+coverage
+*.tsbuildinfo
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Generated Prisma client output
+/src/generated/prisma
