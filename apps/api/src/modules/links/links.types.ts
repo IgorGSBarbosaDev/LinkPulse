@@ -11,7 +11,7 @@ export type CreateLinkInput = z.infer<typeof createLinkSchema>['body']
 
 export type UpdateLinkInput = z.infer<typeof updateLinkSchema>['body']
 
-export type ListLinksInput = z.infer<typeof listLinksSchema>['query']
+export type ListLinksQuery = z.infer<typeof listLinksSchema>['query']
 
 export type LinkIdParams = z.infer<typeof linkIdParamsSchema>['params']
 
@@ -26,7 +26,7 @@ export type Pagination = {
     totalPages: number
 }
 
-export type PaginetedResult<T> = {
+export type PaginatedResult<T> = {
     data: T[]
     pagination: Pagination
 }
@@ -48,7 +48,7 @@ export type LinkResponse ={
     updatedAt: Date
 }
 
-export type AutheticatedRequestUser ={
+export type AuthenticatedRequestUser ={
     id: string
     email?: string
 }

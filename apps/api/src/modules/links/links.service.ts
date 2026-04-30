@@ -1,5 +1,5 @@
 import { randomBytes } from 'node:crypto'
-import { redis } from '../../shared/config/redis'
+import { redis } from '../../shared/config/redis.js'
 import { AppError } from '../../shared/errors/app-error.js'
 import { linksRepository } from './links.repository.js'
 import {
@@ -51,7 +51,7 @@ class LinksService {
       await this.ensureShortCodeIsAvailable(customAlias)
     }
 
-    const shortCode = customAlias ?? await this.generateUniqueShortCode()
+    const shortCode = customAlias ?? (await this.generateUniqueShortCode())
 
     const link = await linksRepository.create({
       userId,
@@ -93,7 +93,11 @@ class LinksService {
     const link = await linksRepository.findByIdAndUserId(linkId, userId)
 
     if (!link) {
-      throw new AppError('Link não encontrado.', 404)
+      throw new AppError({
+        statusCode: 404,
+        error: 'Not Found',
+        message: 'Link not found.',
+      })
     }
 
     return toLinkResponse(link)
@@ -107,7 +111,11 @@ class LinksService {
     const link = await linksRepository.findByIdAndUserId(linkId, userId)
 
     if (!link) {
-      throw new AppError('Link não encontrado.', 404)
+      throw new AppError({
+        statusCode: 404,
+        error: 'Not Found',
+        message: 'Link not found.',
+      })
     }
 
     const updateData: {
@@ -163,7 +171,11 @@ class LinksService {
     const link = await linksRepository.findByIdAndUserId(linkId, userId)
 
     if (!link) {
-      throw new AppError('Link not found.', 404)
+      throw new AppError({
+        statusCode: 404,
+        error: 'Not Found',
+        message: 'Link not found.',
+      })
     }
 
     await linksRepository.softDelete(link.id)
@@ -175,7 +187,11 @@ class LinksService {
     const link = await linksRepository.findByIdAndUserId(linkId, userId)
 
     if (!link) {
-      throw new AppError('Link not found.', 404)
+      throw new AppError({
+        statusCode: 404,
+        error: 'Not Found',
+        message: 'Link not found.',
+      })
     }
 
     const updatedLink = await linksRepository.update(link.id, {
@@ -191,7 +207,11 @@ class LinksService {
     const link = await linksRepository.findByIdAndUserId(linkId, userId)
 
     if (!link) {
-      throw new AppError('Link not found.', 404)
+      throw new AppError({
+        statusCode: 404,
+        error: 'Not Found',
+        message: 'Link not found.',
+      })
     }
 
     const updatedLink = await linksRepository.update(link.id, {
@@ -215,7 +235,11 @@ class LinksService {
       }
     }
 
-    throw new AppError('Failed to generate a unique short code.', 500)
+    throw new AppError({
+      statusCode: 500,
+      error: 'Internal Server Error',
+      message: 'Failed to generate a unique short code.',
+    })
   }
 
   private async ensureShortCodeIsAvailable(
@@ -225,13 +249,21 @@ class LinksService {
     const existingByShortCode = await linksRepository.findByShortCode(shortCode)
 
     if (existingByShortCode && existingByShortCode.id !== currentLinkId) {
-      throw new AppError('This short code is already in use.', 409)
+      throw new AppError({
+        statusCode: 409,
+        error: 'Conflict',
+        message: 'This short code is already in use.',
+      })
     }
 
     const existingByAlias = await linksRepository.findByCustomAlias(shortCode)
 
     if (existingByAlias && existingByAlias.id !== currentLinkId) {
-      throw new AppError('This alias is already in use.', 409)
+      throw new AppError({
+        statusCode: 409,
+        error: 'Conflict',
+        message: 'This alias is already in use.',
+      })
     }
   }
 
@@ -253,7 +285,7 @@ class LinksService {
     try {
       await redis.del(...keys)
     } catch {
-      // Redis don't prevent the main operation in PostgreSQL.
+      // Redis não deve impedir a operação principal no PostgreSQL.
     }
   }
 }

@@ -1,35 +1,30 @@
-import { NextFunction, Request, Response } from 'express'
+import type { NextFunction, Request, Response } from 'express'
 import { AppError } from '../../shared/errors/app-error.js'
 import { linksService } from './links.service.js'
-import { AuthenticatedRequestUser } from './links.types.js'
+import type {
+  AuthenticatedRequestUser,
+  ListLinksQuery,
+} from './links.types.js'
 
 type AuthenticatedRequest = Request & {
   user?: AuthenticatedRequestUser
 }
 
-function getAuthenticatedUserId(req: AuthenticatedRequest) {
+function getAuthenticatedUserId(req: AuthenticatedRequest): string {
   const userId = req.user?.id
 
   if (!userId) {
-    throw new AppError({
-      statusCode: 401,
-      error: 'Unauthorized',
-      message: 'Usuário não autenticado.',
-    })
+    throw AppError.unauthorized('User not authenticated.')
   }
 
   return userId
 }
 
-function getLinkIdFromParams(req: Request) {
+function getLinkIdFromParams(req: Request): string {
   const { id } = req.params
 
-  if (!id || Array.isArray(id)) {
-    throw new AppError({
-      statusCode: 400,
-      error: 'Bad Request',
-      message: 'ID do link inválido.',
-    })
+  if (typeof id !== 'string' || id.trim().length === 0) {
+    throw AppError.badRequest('Invalid link ID.')
   }
 
   return id
@@ -59,8 +54,9 @@ class LinksController {
   ) => {
     try {
       const userId = getAuthenticatedUserId(req)
+      const query = req.query as unknown as ListLinksQuery
 
-      const result = await linksService.list(userId, req.query as any)
+      const result = await linksService.list(userId, query)
 
       return res.status(200).json(result)
     } catch (error) {
