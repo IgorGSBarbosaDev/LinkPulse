@@ -1,88 +1,133 @@
-import { url } from 'node:inspector';
-import { z } from 'zod';
+import { z } from 'zod'
+
+const customAliasSchema = z
+  .string()
+  .trim()
+  .min(3, 'The alias must have at least 3 characters.')
+  .max(50, 'The alias must have at most 50 characters.')
+  .regex(
+    /^[a-zA-Z0-9_-]+$/,
+    'Must contains only letters, numbers, underscores or hyphens.',
+  )
+  .transform((value) => value.toLowerCase())
+
+const optionalTextSchema = (max: number, fieldName: string) =>
+  z
+    .string()
+    .trim()
+    .min(1, `${fieldName} cant be empty.`)
+    .max(max, `${fieldName} must have at most ${max} characters.`)
+
+const futureDateSchema = z.coerce
+  .date({
+    error: 'Expiration date must be a valid date string or timestamp.',
+  })
+  .refine((date) => date.getTime() > Date.now(), {
+    message: 'Expiration date must be a future date.',
+  })
+
+const activeQuerySchema = z
+  .enum(['true', 'false'])
+  .transform((value) => value === 'true')
+  .optional()
 
 export const createLinkSchema = z.object({
-    body: z.object({
-        tittle: z
-        .string()
-        .trim()
-        .min(1, 'Tittle must have at least 1 character')
-        .max(120, 'Tittle must have at most 120 characters'),
+  body: z.object({
+    originalUrl: z
+      .string()
+      .trim()
+      .url('Informe uma URL válida.'),
 
-        url: z
-        .string()
-        .url("Invalid URL format"),
+    customAlias: customAliasSchema.optional(),
 
-        description: z
-        .string()
-        .trim()
-        .max(500, 'Description must have at most 500 characters')
-        .optional(),
+    title: optionalTextSchema(120, 'Título').optional(),
 
-        isFavorite: z
-        .boolean()
-        .optional()
-    })
+    description: optionalTextSchema(500, 'Descrição').optional(),
+
+    expiresAt: futureDateSchema.optional(),
+
+    maxClicks: z.coerce
+      .number()
+      .int('O limite máximo de cliques deve ser um número inteiro.')
+      .positive('O limite máximo de cliques deve ser maior que zero.')
+      .optional(),
+  }),
 })
 
 export const updateLinkSchema = z.object({
-    params: z.object({
-        id: z.string().uuid('Invalid link ID format')
-    }),
+  params: z.object({
+    id: z.string().uuid('ID do link inválido.'),
+  }),
 
-    body: z.object({
-        title: z
+  body: z
+    .object({
+      originalUrl: z
         .string()
         .trim()
-        .min(1, 'Title must have at least 1 character')
-        .max(120, 'Title must have at most 120 characters')
+        .url('Informe uma URL válida.')
         .optional(),
 
-        url: z
-        .string()
-        .url("Invalid URL format")
+      customAlias: customAliasSchema.optional(),
+
+      title: optionalTextSchema(120, 'Título').nullable().optional(),
+
+      description: optionalTextSchema(500, 'Descrição').nullable().optional(),
+
+      expiresAt: z.union([futureDateSchema, z.null()]).optional(),
+
+      maxClicks: z
+        .union([
+          z.coerce
+            .number()
+            .int('O limite máximo de cliques deve ser um número inteiro.')
+            .positive('O limite máximo de cliques deve ser maior que zero.'),
+          z.null(),
+        ])
         .optional(),
 
-        description: z
-        .string()
-        .max(500, 'Description must have at most 500 characters')
-        .optional(),
-
-        isFavorite: z
-        .boolean()
-        .optional()
-    }).refine(
-        data => Object.keys(data).length > 0, 'At least one field must be provided for update'
-    )
+      active: z.boolean().optional(),
+    })
+    .refine((data) => Object.keys(data).length > 0, {
+      message: 'Informe ao menos um campo para atualização.',
+    }),
 })
 
-export const linkParamsSchema = z.object({
-    params: z.object({
-        id: z.string().uuid('Invalid link ID format')
-    })
+export const linkIdParamsSchema = z.object({
+  params: z.object({
+    id: z.string().uuid('ID do link inválido.'),
+  }),
 })
 
-export const queryLinksSchema = z.object({
-    query: z.object({
-        search: z
-        .string()
-        .optional(),
+export const listLinksSchema = z.object({
+  query: z.object({
+    page: z.coerce
+      .number()
+      .int()
+      .min(1)
+      .default(1),
 
-        page: z
-        .coerce.number()
-        .int()
-        .positive()
-        .optional(),
+    limit: z.coerce
+      .number()
+      .int()
+      .min(1)
+      .max(100)
+      .default(10),
 
-        limit: z
-        .coerce.number()
-        .int()
-        .positive()
-        .max(100, 'Limit must be at most 100')
-        .optional(),
+    search: z
+      .string()
+      .trim()
+      .min(1)
+      .max(120)
+      .optional(),
 
-        idFavorite: z
-        .coerce.boolean()
-        .optional()
-    })
+    active: activeQuerySchema,
+
+    sort: z
+      .enum(['createdAt', 'clickCount', 'title'])
+      .default('createdAt'),
+
+    order: z
+      .enum(['asc', 'desc'])
+      .default('desc'),
+  }),
 })
