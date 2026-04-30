@@ -2,20 +2,20 @@ import { randomBytes } from 'node:crypto'
 import { redis } from '../../shared/config/redis.js'
 import { AppError } from '../../shared/errors/app-error.js'
 import { linksRepository } from './links.repository.js'
-import {
+import { toLinkResponse } from './links.mapper.js'
+import type {
   CreateLinkInput,
   LinkResponse,
   ListLinksQuery,
   PaginatedResult,
   UpdateLinkInput,
 } from './links.types.js'
-import { toLinkResponse } from './links.mapper.js'
 
 const SHORT_CODE_LENGTH = 7
 const SHORT_CODE_ALPHABET =
   'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
 
-function generateShortCode(length = SHORT_CODE_LENGTH) {
+function generateShortCode(length = SHORT_CODE_LENGTH): string {
   const bytes = randomBytes(length)
 
   return Array.from(bytes)
@@ -23,13 +23,13 @@ function generateShortCode(length = SHORT_CODE_LENGTH) {
     .join('')
 }
 
-function normalizeUrl(url: string) {
+function normalizeUrl(url: string): string {
   return new URL(url.trim()).toString()
 }
 
-function toDateOrNull(value: Date | string | null | undefined) {
-  if (value === undefined) {
-    return undefined
+function toDateOrNull(value: Date | string | null): Date | null {
+  if (value === null) {
+    return null
   }
 
   if (value === null) {
@@ -90,15 +90,7 @@ class LinksService {
   }
 
   async findById(userId: string, linkId: string): Promise<LinkResponse> {
-    const link = await linksRepository.findByIdAndUserId(linkId, userId)
-
-    if (!link) {
-      throw new AppError({
-        statusCode: 404,
-        error: 'Not Found',
-        message: 'Link not found.',
-      })
-    }
+    const link = await this.getUserLinkOrFail(userId, linkId)
 
     return toLinkResponse(link)
   }
@@ -108,15 +100,7 @@ class LinksService {
     linkId: string,
     data: UpdateLinkInput,
   ): Promise<LinkResponse> {
-    const link = await linksRepository.findByIdAndUserId(linkId, userId)
-
-    if (!link) {
-      throw new AppError({
-        statusCode: 404,
-        error: 'Not Found',
-        message: 'Link not found.',
-      })
-    }
+    const link = await this.getUserLinkOrFail(userId, linkId)
 
     const updateData: {
       originalUrl?: string
@@ -168,15 +152,7 @@ class LinksService {
   }
 
   async delete(userId: string, linkId: string): Promise<void> {
-    const link = await linksRepository.findByIdAndUserId(linkId, userId)
-
-    if (!link) {
-      throw new AppError({
-        statusCode: 404,
-        error: 'Not Found',
-        message: 'Link not found.',
-      })
-    }
+    const link = await this.getUserLinkOrFail(userId, linkId)
 
     await linksRepository.softDelete(link.id)
 
@@ -184,15 +160,7 @@ class LinksService {
   }
 
   async activate(userId: string, linkId: string): Promise<LinkResponse> {
-    const link = await linksRepository.findByIdAndUserId(linkId, userId)
-
-    if (!link) {
-      throw new AppError({
-        statusCode: 404,
-        error: 'Not Found',
-        message: 'Link not found.',
-      })
-    }
+    const link = await this.getUserLinkOrFail(userId, linkId)
 
     const updatedLink = await linksRepository.update(link.id, {
       active: true,
@@ -204,15 +172,7 @@ class LinksService {
   }
 
   async deactivate(userId: string, linkId: string): Promise<LinkResponse> {
-    const link = await linksRepository.findByIdAndUserId(linkId, userId)
-
-    if (!link) {
-      throw new AppError({
-        statusCode: 404,
-        error: 'Not Found',
-        message: 'Link not found.',
-      })
-    }
+    const link = await this.getUserLinkOrFail(userId, linkId)
 
     const updatedLink = await linksRepository.update(link.id, {
       active: false,
@@ -223,7 +183,17 @@ class LinksService {
     return toLinkResponse(updatedLink)
   }
 
-  private async generateUniqueShortCode() {
+  private async getUserLinkOrFail(userId: string, linkId: string) {
+    const link = await linksRepository.findByIdAndUserId(linkId, userId)
+
+    if (!link) {
+      throw AppError.notFound('Link not found.')
+    }
+
+    return link
+  }
+
+  private async generateUniqueShortCode(): Promise<string> {
     const maxAttempts = 5
 
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -235,41 +205,29 @@ class LinksService {
       }
     }
 
-    throw new AppError({
-      statusCode: 500,
-      error: 'Internal Server Error',
-      message: 'Failed to generate a unique short code.',
-    })
+    throw AppError.internal('Failed to generate a unique short code.')
   }
 
   private async ensureShortCodeIsAvailable(
     shortCode: string,
     currentLinkId?: string,
-  ) {
+  ): Promise<void> {
     const existingByShortCode = await linksRepository.findByShortCode(shortCode)
 
     if (existingByShortCode && existingByShortCode.id !== currentLinkId) {
-      throw new AppError({
-        statusCode: 409,
-        error: 'Conflict',
-        message: 'This short code is already in use.',
-      })
+      throw AppError.conflict('This short code is already in use.')
     }
 
     const existingByAlias = await linksRepository.findByCustomAlias(shortCode)
 
     if (existingByAlias && existingByAlias.id !== currentLinkId) {
-      throw new AppError({
-        statusCode: 409,
-        error: 'Conflict',
-        message: 'This alias is already in use.',
-      })
+      throw AppError.conflict('This alias is already in use.')
     }
   }
 
   private async invalidateRedirectCache(
     ...shortCodes: Array<string | null | undefined>
-  ) {
+  ): Promise<void> {
     const uniqueShortCodes = Array.from(
       new Set(shortCodes.filter(Boolean)),
     ) as string[]
@@ -285,7 +243,7 @@ class LinksService {
     try {
       await redis.del(...keys)
     } catch {
-      // Redis não deve impedir a operação principal no PostgreSQL.
+      // Redis should not block the main PostgreSQL operation.
     }
   }
 }
