@@ -10,12 +10,3 @@ export const ErrorCode = {
 } as const
 
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode]
-
-/*
-should use:
-throw new AppError({
-  statusCode: 409,
-  error: ErrorCode.CONFLICT,
-  message: 'Email already registered',
-})
-*/
