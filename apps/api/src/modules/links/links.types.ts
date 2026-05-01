@@ -34,6 +34,7 @@ export type PaginatedResult<T> = {
 export type LinkResponse ={
     id: string
     originalUrl: string
+    shortCode: string
     customAlias: string | null
     shortUrl: string
     title: string | null
