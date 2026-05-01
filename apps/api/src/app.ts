@@ -9,9 +9,9 @@ import { errorHandler } from './shared/errors/error-handler.js'
 import { notFoundMiddleware } from './shared/middlewares/not-found.middleware.js'
 
 import { authRoutes } from './modules/auth/auth.routes.js'
+import { analyticsRoutes } from './modules/analytics/analytics.routes.js'
+import { linksRoutes } from './modules/links/links.routes.js'
 import { redirectRoutes } from './modules/redirects/redirects.routes.js'
-// import { linksRoutes } from './modules/links/links.routes.js'
-// import { analyticsRoutes } from './modules/analytics/analytics.routes.js'
 
 dotenv.config()
 
@@ -35,10 +35,9 @@ app.get('/health', (_req, res) => {
 })
 
 app.use('/api/v1/auth', authRoutes)
+app.use('/api/v1/links', linksRoutes)
+app.use('/api/v1', analyticsRoutes)
 app.use('/r', redirectRoutes)
-
-// app.use('/api/v1/links', linksRoutes)
-// app.use('/api/v1/analytics', analyticsRoutes)
 
 app.use(notFoundMiddleware)
 app.use(errorHandler)

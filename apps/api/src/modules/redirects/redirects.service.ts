@@ -30,14 +30,12 @@ class RedirectsService {
       throw AppError.gone('Link has reached its maximum number of clicks.')
     }
 
-    await redirectsRepository.createAccessEvent({
+    await redirectsRepository.recordAccessAndIncrementClickCount({
       shortLinkId: link.id,
       ipAddress: input.metadata.ipAddress,
       userAgent: input.metadata.userAgent,
       referer: input.metadata.referer,
     })
-
-    await redirectsRepository.incrementClickCount(link.id)
 
     return {
       originalUrl: link.originalUrl,

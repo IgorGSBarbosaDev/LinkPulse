@@ -1,6 +1,6 @@
 import { prisma } from '../../shared/config/prisma.js'
 import type {
-  CreateAccessEventInput,
+  RecordAccessAndIncrementInput,
   RedirectLinkRecord,
 } from './redirects.types.js'
 
@@ -25,27 +25,29 @@ class RedirectsRepository {
     })
   }
 
-  async createAccessEvent(data: CreateAccessEventInput): Promise<void> {
-    await prisma.linkAccessEvent.create({
-      data: {
-        shortLinkId: data.shortLinkId,
-        ipAddress: data.ipAddress,
-        userAgent: data.userAgent,
-        referer: data.referer,
-      },
-    })
-  }
-
-  async incrementClickCount(shortLinkId: string): Promise<void> {
-    await prisma.shortLink.update({
-      where: {
-        id: shortLinkId,
-      },
-      data: {
-        clickCount: {
-          increment: 1,
+  async recordAccessAndIncrementClickCount(
+    data: RecordAccessAndIncrementInput,
+  ): Promise<void> {
+    await prisma.$transaction(async (tx) => {
+      await tx.linkAccessEvent.create({
+        data: {
+          shortLinkId: data.shortLinkId,
+          ipAddress: data.ipAddress,
+          userAgent: data.userAgent,
+          referer: data.referer,
         },
-      },
+      })
+
+      await tx.shortLink.update({
+        where: {
+          id: data.shortLinkId,
+        },
+        data: {
+          clickCount: {
+            increment: 1,
+          },
+        },
+      })
     })
   }
 }

@@ -29,7 +29,7 @@ export type RedirectLinkRecord = {
   deletedAt: Date | null
 }
 
-export type CreateAccessEventInput = {
+export type RecordAccessAndIncrementInput = {
   shortLinkId: string
   ipAddress: string | null
   userAgent: string | null
