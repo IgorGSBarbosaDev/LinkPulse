@@ -7,6 +7,7 @@ import dotenv from 'dotenv'
 
 import { errorHandler } from './shared/errors/error-handler.js'
 import { notFoundMiddleware } from './shared/middlewares/not-found.middleware.js'
+import { swaggerServe, swaggerSetup } from './shared/config/swagger.js'
 
 import { authRoutes } from './modules/auth/auth.routes.js'
 import { analyticsRoutes } from './modules/analytics/analytics.routes.js'
@@ -26,6 +27,7 @@ app.use(
 )
 
 app.use(express.json())
+app.use('/docs', swaggerServe, swaggerSetup)
 
 app.get('/health', (_req, res) => {
   return res.status(200).json({

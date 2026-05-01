@@ -367,6 +367,18 @@ API: http://localhost:3000
 WEB: http://localhost:5173
 ```
 
+Swagger/OpenAPI:
+
+```txt
+Docs UI: http://localhost:3000/docs
+```
+
+Para autorizar endpoints protegidos no Swagger UI:
+- FaÃ§a login em `POST /api/v1/auth/login`.
+- Copie valor de `acessToken` retornado.
+- Clique em **Authorize** no Swagger UI.
+- Informe: `Bearer <seu_token>`.
+
 ---
 
 ## Variáveis de ambiente
