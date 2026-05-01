@@ -100,6 +100,14 @@ export async function deleteRedisKey(key: string): Promise<void> {
   await redis.del(key)
 }
 
+export async function deleteRedisKeys(keys: string[]): Promise<void> {
+  if (keys.length === 0) {
+    return
+  }
+
+  await redis.del(...keys)
+}
+
 export function buildRedisKey(...parts: Array<string | number | null | undefined>) {
   return parts
     .filter((part): part is string | number => part !== null && part !== undefined)

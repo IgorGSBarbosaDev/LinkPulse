@@ -74,6 +74,12 @@ const envSchema = z.object({
     .int()
     .positive()
     .default(60),
+
+  REDIRECT_CACHE_TTL_SECONDS: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(3600),
 })
 
 const parsedEnv = envSchema.safeParse(process.env)
