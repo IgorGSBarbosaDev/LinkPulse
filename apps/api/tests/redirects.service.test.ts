@@ -6,8 +6,7 @@ import { redirectsRepository } from '../src/modules/redirects/redirects.reposito
 vi.mock('../src/modules/redirects/redirects.repository.js', () => ({
   redirectsRepository: {
     findRedirectLinkByShortCode: vi.fn(),
-    createAccessEvent: vi.fn(),
-    incrementClickCount: vi.fn(),
+    recordAccessAndIncrementClickCount: vi.fn(),
   },
 }))
 
@@ -33,8 +32,9 @@ describe('redirectsService.resolveRedirect', () => {
     mockedRedirectsRepository.findRedirectLinkByShortCode.mockResolvedValue(
       baseLink,
     )
-    mockedRedirectsRepository.createAccessEvent.mockResolvedValue(undefined)
-    mockedRedirectsRepository.incrementClickCount.mockResolvedValue(undefined)
+    mockedRedirectsRepository.recordAccessAndIncrementClickCount.mockResolvedValue(
+      undefined,
+    )
 
     const result = await redirectsService.resolveRedirect({
       shortCode: 'abc123',
@@ -51,15 +51,14 @@ describe('redirectsService.resolveRedirect', () => {
     expect(
       mockedRedirectsRepository.findRedirectLinkByShortCode,
     ).toHaveBeenCalledWith('abc123')
-    expect(mockedRedirectsRepository.createAccessEvent).toHaveBeenCalledWith({
+    expect(
+      mockedRedirectsRepository.recordAccessAndIncrementClickCount,
+    ).toHaveBeenCalledWith({
       shortLinkId: 'link-id',
       ipAddress: '127.0.0.1',
       userAgent: 'vitest-agent',
       referer: 'https://referrer.test',
     })
-    expect(mockedRedirectsRepository.incrementClickCount).toHaveBeenCalledWith(
-      'link-id',
-    )
   })
 
   it('throws not found when short code does not exist', async () => {
@@ -78,6 +77,10 @@ describe('redirectsService.resolveRedirect', () => {
       statusCode: 404,
       error: 'Not Found',
     })
+
+    expect(
+      mockedRedirectsRepository.recordAccessAndIncrementClickCount,
+    ).not.toHaveBeenCalled()
   })
 
   it('throws not found when link is soft deleted', async () => {
@@ -99,6 +102,10 @@ describe('redirectsService.resolveRedirect', () => {
       statusCode: 404,
       error: 'Not Found',
     })
+
+    expect(
+      mockedRedirectsRepository.recordAccessAndIncrementClickCount,
+    ).not.toHaveBeenCalled()
   })
 
   it('throws gone when link is inactive', async () => {
@@ -120,6 +127,10 @@ describe('redirectsService.resolveRedirect', () => {
       statusCode: 410,
       error: 'Gone',
     })
+
+    expect(
+      mockedRedirectsRepository.recordAccessAndIncrementClickCount,
+    ).not.toHaveBeenCalled()
   })
 
   it('throws gone when link is expired', async () => {
@@ -141,6 +152,10 @@ describe('redirectsService.resolveRedirect', () => {
       statusCode: 410,
       error: 'Gone',
     })
+
+    expect(
+      mockedRedirectsRepository.recordAccessAndIncrementClickCount,
+    ).not.toHaveBeenCalled()
   })
 
   it('throws gone when max clicks reached', async () => {
@@ -163,5 +178,9 @@ describe('redirectsService.resolveRedirect', () => {
       statusCode: 410,
       error: 'Gone',
     })
+
+    expect(
+      mockedRedirectsRepository.recordAccessAndIncrementClickCount,
+    ).not.toHaveBeenCalled()
   })
 })
