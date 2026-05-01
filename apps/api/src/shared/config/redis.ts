@@ -1,4 +1,4 @@
-import Redis, { type RedisOptions } from 'ioredis'
+import { Redis, type RedisOptions } from 'ioredis'
 import { env } from './env.js'
 
 const redisOptions: RedisOptions = {
