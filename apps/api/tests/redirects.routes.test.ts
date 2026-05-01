@@ -1,6 +1,7 @@
 import request from 'supertest'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AppError } from '../src/shared/errors/app-error.js'
+import { rateLimitService } from '../src/modules/rate-limit/rate-limit.service.js'
 
 const resolveRedirectMock = vi.fn()
 
@@ -10,9 +11,21 @@ vi.mock('../src/modules/redirects/redirects.service.js', () => ({
   },
 }))
 
+vi.mock('../src/modules/rate-limit/rate-limit.service.js', () => ({
+  rateLimitService: {
+    consume: vi.fn(),
+  },
+}))
+
+const mockedRateLimitService = vi.mocked(rateLimitService)
+
 describe('GET /r/:shortCode', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockedRateLimitService.consume.mockResolvedValue({
+      allowed: true,
+      current: 1,
+    })
   })
 
   it('redirects valid link with 302 and location header', async () => {
@@ -76,5 +89,25 @@ describe('GET /r/:shortCode', () => {
       error: 'Gone',
       message: 'Link is inactive.',
     })
+  })
+
+  it('returns 429 when redirect rate limit is exceeded', async () => {
+    const { app } = await import('../src/app.js')
+
+    mockedRateLimitService.consume.mockResolvedValue({
+      allowed: false,
+      current: 101,
+    })
+
+    const response = await request(app)
+      .get('/r/abc123')
+      .redirects(0)
+
+    expect(response.status).toBe(429)
+    expect(response.body).toMatchObject({
+      statusCode: 429,
+      error: 'Too Many Requests',
+    })
+    expect(resolveRedirectMock).not.toHaveBeenCalled()
   })
 })

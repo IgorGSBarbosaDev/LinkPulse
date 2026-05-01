@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AppError } from '../src/shared/errors/app-error.js'
 import { redirectsService } from '../src/modules/redirects/redirects.service.js'
+import { redirectCacheService } from '../src/modules/redirects/redirect-cache.service.js'
 import { redirectsRepository } from '../src/modules/redirects/redirects.repository.js'
 
 vi.mock('../src/modules/redirects/redirects.repository.js', () => ({
@@ -10,7 +11,16 @@ vi.mock('../src/modules/redirects/redirects.repository.js', () => ({
   },
 }))
 
+vi.mock('../src/modules/redirects/redirect-cache.service.js', () => ({
+  redirectCacheService: {
+    get: vi.fn(),
+    set: vi.fn(),
+    invalidateMany: vi.fn(),
+  },
+}))
+
 const mockedRedirectsRepository = vi.mocked(redirectsRepository)
+const mockedRedirectCacheService = vi.mocked(redirectCacheService)
 
 const baseLink = {
   id: 'link-id',
@@ -26,6 +36,7 @@ const baseLink = {
 describe('redirectsService.resolveRedirect', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockedRedirectCacheService.get.mockResolvedValue(null)
   })
 
   it('returns original URL and records access for valid link', async () => {
@@ -51,6 +62,7 @@ describe('redirectsService.resolveRedirect', () => {
     expect(
       mockedRedirectsRepository.findRedirectLinkByShortCode,
     ).toHaveBeenCalledWith('abc123')
+    expect(mockedRedirectCacheService.set).toHaveBeenCalledTimes(1)
     expect(
       mockedRedirectsRepository.recordAccessAndIncrementClickCount,
     ).toHaveBeenCalledWith({
@@ -59,6 +71,41 @@ describe('redirectsService.resolveRedirect', () => {
       userAgent: 'vitest-agent',
       referer: 'https://referrer.test',
     })
+  })
+
+  it('uses cache hit and skips database fetch', async () => {
+    mockedRedirectCacheService.get.mockResolvedValue({
+      id: 'link-id',
+      originalUrl: 'https://example.com/page',
+      shortCode: 'abc123',
+      active: true,
+      expiresAt: null,
+      maxClicks: null,
+      clickCount: 3,
+    })
+    mockedRedirectsRepository.recordAccessAndIncrementClickCount.mockResolvedValue(
+      undefined,
+    )
+
+    const result = await redirectsService.resolveRedirect({
+      shortCode: 'abc123',
+      metadata: {
+        ipAddress: '127.0.0.1',
+        userAgent: 'vitest-agent',
+        referer: 'https://referrer.test',
+      },
+    })
+
+    expect(result).toEqual({
+      originalUrl: 'https://example.com/page',
+    })
+    expect(
+      mockedRedirectsRepository.findRedirectLinkByShortCode,
+    ).not.toHaveBeenCalled()
+    expect(mockedRedirectCacheService.set).not.toHaveBeenCalled()
+    expect(
+      mockedRedirectsRepository.recordAccessAndIncrementClickCount,
+    ).toHaveBeenCalledTimes(1)
   })
 
   it('throws not found when short code does not exist', async () => {
