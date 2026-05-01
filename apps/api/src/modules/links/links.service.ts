@@ -1,6 +1,6 @@
 import { randomBytes } from 'node:crypto'
-import { redis } from '../../shared/config/redis.js'
 import { AppError } from '../../shared/errors/app-error.js'
+import { redirectCacheService } from '../redirects/redirect-cache.service.js'
 import { linksRepository } from './links.repository.js'
 import { toLinkResponse } from './links.mapper.js'
 import type {
@@ -228,23 +228,7 @@ class LinksService {
   private async invalidateRedirectCache(
     ...shortCodes: Array<string | null | undefined>
   ): Promise<void> {
-    const uniqueShortCodes = Array.from(
-      new Set(shortCodes.filter(Boolean)),
-    ) as string[]
-
-    if (uniqueShortCodes.length === 0) {
-      return
-    }
-
-    const keys = uniqueShortCodes.map(
-      (shortCode) => `link:redirect:${shortCode}`,
-    )
-
-    try {
-      await redis.del(...keys)
-    } catch {
-      // Redis should not block the main PostgreSQL operation.
-    }
+    await redirectCacheService.invalidateMany(shortCodes)
   }
 }
 

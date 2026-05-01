@@ -1,5 +1,10 @@
 import { Router } from 'express'
-import { authMiddleware } from '../../shared/middlewares/auth.middleware.js'
+import { env } from '../../shared/config/env.js'
+import {
+  authMiddleware,
+  type AuthenticatedRequest,
+} from '../../shared/middlewares/auth.middleware.js'
+import { createRateLimitMiddleware } from '../../shared/middlewares/rate-limit.middleware.js'
 import { validateRequest } from '../../shared/middlewares/validate-request.middleware.js'
 import { linksController } from './links.controller.js'
 import {
@@ -15,6 +20,15 @@ linksRoutes.use(authMiddleware)
 
 linksRoutes.post(
   '/',
+  createRateLimitMiddleware({
+    keyPrefix: 'rate:create-link',
+    max: env.RATE_LIMIT_CREATE_LINK_MAX,
+    windowInSeconds: env.RATE_LIMIT_CREATE_LINK_WINDOW_SECONDS,
+    getIdentifier: (req) => {
+      const userId = (req as AuthenticatedRequest).user?.id
+      return typeof userId === 'string' && userId.length > 0 ? userId : null
+    },
+  }),
   validateRequest(createLinkSchema),
   linksController.create,
 )
