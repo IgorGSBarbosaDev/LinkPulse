@@ -52,6 +52,23 @@ export function LinkFilters({ filters, onChange }: LinkFiltersProps) {
             {option.label}
           </Button>
         ))}
+        <label className="flex items-center gap-2 rounded-md border border-border bg-background px-2.5 py-1.5 text-xs text-muted-foreground">
+          <span className="uppercase tracking-label">Sort</span>
+          <select
+            className="bg-transparent text-xs text-foreground outline-none"
+            onChange={(event) =>
+              onChange({
+                sort: event.target.value as LinksFilters['sort'],
+                page: 1,
+              })
+            }
+            value={filters.sort}
+          >
+            <option value="createdAt">Created</option>
+            <option value="clickCount">Clicks</option>
+            <option value="title">Title</option>
+          </select>
+        </label>
       </div>
     </div>
   )

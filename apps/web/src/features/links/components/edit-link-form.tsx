@@ -1,11 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Trash2 } from 'lucide-react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 
 import type { ApiError } from '../../../shared/api/api-error'
 import { Button } from '../../../shared/components/ui/button'
 import { cn } from '../../../shared/lib/utils'
+import { useDeleteLink } from '../hooks/use-link-actions'
 import { useUpdateLink } from '../hooks/use-update-link'
 import {
   editLinkSchema,
@@ -43,7 +45,9 @@ type EditLinkFormProps = {
 
 export function EditLinkForm({ link }: EditLinkFormProps) {
   const updateLink = useUpdateLink(link.id)
+  const deleteLink = useDeleteLink()
   const navigate = useNavigate()
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const {
     formState: { errors },
     handleSubmit,
@@ -74,6 +78,7 @@ export function EditLinkForm({ link }: EditLinkFormProps) {
   }
 
   return (
+    <>
     <form
       className="rounded-lg border border-border bg-card"
       noValidate
@@ -199,17 +204,64 @@ export function EditLinkForm({ link }: EditLinkFormProps) {
       ) : null}
 
       <div className="mt-6 flex flex-col-reverse gap-3 border-t border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-        <Link
-          className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-border bg-card px-4 text-xs font-medium uppercase tracking-label text-foreground transition-colors hover:bg-muted"
-          to={`/links/${link.id}`}
-        >
-          <ArrowLeft aria-hidden="true" className="size-4" />
-          Back to details
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-border bg-card px-4 text-xs font-medium uppercase tracking-label text-foreground transition-colors hover:bg-muted"
+            to={`/links/${link.id}`}
+          >
+            <ArrowLeft aria-hidden="true" className="size-4" />
+            Back to details
+          </Link>
+          <Button
+            onClick={() => setIsDeleteOpen(true)}
+            size="sm"
+            type="button"
+            variant="secondary"
+          >
+            <Trash2 aria-hidden="true" className="size-4" />
+            Delete link
+          </Button>
+        </div>
         <Button disabled={updateLink.isPending} type="submit" variant="primary">
           {updateLink.isPending ? 'Saving...' : 'Save changes'}
         </Button>
       </div>
     </form>
+
+    {isDeleteOpen ? (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+        <div className="w-full max-w-sm rounded-lg border border-border bg-card p-5 shadow-none">
+          <div className="flex flex-col gap-2">
+            <h2 className="text-lg font-semibold text-foreground">Delete link?</h2>
+            <p className="text-sm leading-6 text-muted-foreground">
+              This removes this link from normal lists. Analytics history stays backend-owned.
+            </p>
+          </div>
+          <div className="mt-5 flex justify-end gap-2">
+            <Button
+              disabled={deleteLink.isPending}
+              onClick={() => setIsDeleteOpen(false)}
+              size="sm"
+              variant="secondary"
+            >
+              Cancel
+            </Button>
+            <Button
+              disabled={deleteLink.isPending}
+              onClick={async () => {
+                await deleteLink.mutateAsync(link.id)
+                setIsDeleteOpen(false)
+                navigate('/links', { replace: true })
+              }}
+              size="sm"
+              variant="primary"
+            >
+              {deleteLink.isPending ? 'Deleting...' : 'Delete'}
+            </Button>
+          </div>
+        </div>
+      </div>
+    ) : null}
+    </>
   )
 }

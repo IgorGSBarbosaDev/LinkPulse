@@ -55,8 +55,6 @@ describe('dashboard metrics', () => {
       totalLinks: 2,
       totalClicks: 20,
       activeLinks: 1,
-      expiredLinks: 1,
-      clicksLast7Days: 8,
     })
   })
 

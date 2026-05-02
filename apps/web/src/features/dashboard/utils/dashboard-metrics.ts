@@ -10,14 +10,9 @@ export function buildDashboardSummary(
   summaries: DashboardLinkSummary[],
 ): DashboardSummary {
   return {
-    totalLinks: links.length,
     totalClicks: summaries.reduce((sum, item) => sum + item.totalClicks, 0),
     activeLinks: links.filter((link) => link.active).length,
-    expiredLinks: links.filter((link) => link.expired).length,
-    clicksLast7Days: summaries.reduce(
-      (sum, item) => sum + item.clicksLast7Days,
-      0,
-    ),
+    totalLinks: links.length,
   }
 }
 

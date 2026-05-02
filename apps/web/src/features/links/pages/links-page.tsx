@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useSearchParams } from 'react-router-dom'
+import { Activity, Link as LinkIcon, MousePointerClick, TimerOff } from 'lucide-react'
 
 import { EmptyState } from '../../../shared/components/feedback/empty-state'
 import { ErrorState } from '../../../shared/components/feedback/error-state'
@@ -9,11 +10,6 @@ import { Button } from '../../../shared/components/ui/button'
 import { LinkFilters } from '../components/link-filters'
 import { LinksPagination } from '../components/links-pagination'
 import { LinksTable } from '../components/links-table'
-import {
-  useActivateLink,
-  useDeactivateLink,
-  useDeleteLink,
-} from '../hooks/use-link-actions'
 import { useLinks } from '../hooks/use-links'
 import type { LinksFilters as LinksFiltersData } from '../types'
 import {
@@ -26,11 +22,6 @@ export function LinksPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const filters = parseLinksSearchParams(searchParams)
   const linksQuery = useLinks(filters)
-  const activateLink = useActivateLink()
-  const deactivateLink = useDeactivateLink()
-  const deleteLink = useDeleteLink()
-  const isMutating =
-    activateLink.isPending || deactivateLink.isPending || deleteLink.isPending
 
   function updateFilters(patch: Partial<LinksFiltersData>) {
     setSearchParams(buildLinksSearchParams(patchLinksFilters(filters, patch)), {
@@ -41,6 +32,10 @@ export function LinksPage() {
   const links = linksQuery.data?.data ?? []
   const pagination = linksQuery.data?.pagination
   const hasActiveFilters = Boolean(filters.search.trim()) || filters.active !== 'all'
+  const totalLinks = pagination?.totalItems ?? links.length
+  const activeLinks = links.filter((link) => link.active).length
+  const expiredLinks = links.filter((link) => link.expired).length
+  const totalClicks = links.reduce((sum, link) => sum + link.clickCount, 0)
 
   return (
     <PageContainer
@@ -110,12 +105,70 @@ export function LinksPage() {
 
         {linksQuery.isSuccess && links.length > 0 ? (
           <>
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="rounded-lg border border-border bg-card px-4 py-3.5">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-xs font-medium uppercase tracking-label text-muted-foreground">
+                      Total links
+                    </span>
+                    <span className="font-mono text-[1.625rem] font-semibold leading-tight text-foreground">
+                      {new Intl.NumberFormat('en').format(totalLinks)}
+                    </span>
+                  </div>
+                  <span className="rounded-md border border-border bg-surface p-2 text-muted-foreground">
+                    <LinkIcon aria-hidden="true" className="size-4" />
+                  </span>
+                </div>
+              </div>
+              <div className="rounded-lg border border-border bg-card px-4 py-3.5">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-xs font-medium uppercase tracking-label text-muted-foreground">
+                      Active links
+                    </span>
+                    <span className="font-mono text-[1.625rem] font-semibold leading-tight text-foreground">
+                      {new Intl.NumberFormat('en').format(activeLinks)}
+                    </span>
+                  </div>
+                  <span className="rounded-md border border-border bg-surface p-2 text-muted-foreground">
+                    <Activity aria-hidden="true" className="size-4" />
+                  </span>
+                </div>
+              </div>
+              <div className="rounded-lg border border-border bg-card px-4 py-3.5">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-xs font-medium uppercase tracking-label text-muted-foreground">
+                      Expired links
+                    </span>
+                    <span className="font-mono text-[1.625rem] font-semibold leading-tight text-foreground">
+                      {new Intl.NumberFormat('en').format(expiredLinks)}
+                    </span>
+                  </div>
+                  <span className="rounded-md border border-border bg-surface p-2 text-muted-foreground">
+                    <TimerOff aria-hidden="true" className="size-4" />
+                  </span>
+                </div>
+              </div>
+              <div className="rounded-lg border border-border bg-card px-4 py-3.5">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-xs font-medium uppercase tracking-label text-muted-foreground">
+                      Total clicks
+                    </span>
+                    <span className="font-mono text-[1.625rem] font-semibold leading-tight text-foreground">
+                      {new Intl.NumberFormat('en').format(totalClicks)}
+                    </span>
+                  </div>
+                  <span className="rounded-md border border-border bg-surface p-2 text-muted-foreground">
+                    <MousePointerClick aria-hidden="true" className="size-4" />
+                  </span>
+                </div>
+              </div>
+            </div>
             <LinksTable
-              isMutating={isMutating}
               links={links}
-              onActivate={(linkId) => activateLink.mutate(linkId)}
-              onDeactivate={(linkId) => deactivateLink.mutate(linkId)}
-              onDelete={(linkId) => deleteLink.mutate(linkId)}
             />
             {pagination ? (
               <LinksPagination
