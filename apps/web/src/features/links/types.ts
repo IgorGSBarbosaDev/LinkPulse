@@ -18,6 +18,14 @@ export type LinkListItem = {
   updatedAt?: string
 }
 
+export type LinkDetails = LinkListItem & {
+  customAlias: string | null
+  description: string | null
+  reachedMaxClicks: boolean
+  maxClicks: number | null
+  updatedAt: string
+}
+
 export type LinksPagination = {
   page: number
   limit: number
@@ -46,4 +54,26 @@ export type ListLinksParams = {
   active?: boolean
   sort: LinkSortField
   order: SortOrder
+}
+
+export type CreateLinkRequest = {
+  originalUrl: string
+  customAlias?: string
+  title?: string
+  description?: string
+  expiresAt?: string
+  maxClicks?: number
+}
+
+export type UpdateLinkRequest = {
+  title?: string | null
+  description?: string | null
+  expiresAt?: string | null
+  maxClicks?: number | null
+  active?: boolean
+}
+
+export type UpdateLinkVariables = {
+  linkId: string
+  payload: UpdateLinkRequest
 }

@@ -1,16 +1,13 @@
 import { PageContainer } from '../../../shared/components/layout/page-container'
-import { PlaceholderPanel } from '../../../shared/components/feedback/placeholder-panel'
+import { CreateLinkForm } from '../components/create-link-form'
 
 export function CreateLinkPage() {
   return (
     <PageContainer
       title="Create link"
-      description="Create route prepared for original URL, alias, title, description, expiration, and max clicks."
+      description="Create a short link with optional alias, expiration, and click limit."
     >
-      <PlaceholderPanel
-        title="Create form not wired yet"
-        description="Phase 4 will add React Hook Form, Zod validation, and create-link mutation."
-      />
+      <CreateLinkForm />
     </PageContainer>
   )
 }
