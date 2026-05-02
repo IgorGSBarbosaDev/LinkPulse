@@ -90,7 +90,6 @@ export function CreateLinkForm() {
             <input
               className={cn(inputClasses, errors.originalUrl && 'border-error')}
               id="originalUrl"
-              placeholder="https://example.com/article"
               type="url"
               {...register('originalUrl')}
             />
@@ -110,7 +109,6 @@ export function CreateLinkForm() {
               className={cn(inputClasses, errors.title && 'border-error')}
               id="title"
               maxLength={120}
-              placeholder="Backend article"
               type="text"
               {...register('title')}
             />
@@ -133,7 +131,6 @@ export function CreateLinkForm() {
               )}
               id="description"
               maxLength={500}
-              placeholder="Optional context for this link"
               {...register('description')}
             />
             {errors.description ? (
@@ -154,7 +151,6 @@ export function CreateLinkForm() {
               className={cn(inputClasses, errors.customAlias && 'border-error')}
               id="customAlias"
               maxLength={50}
-              placeholder="backend-artigo"
               type="text"
               {...register('customAlias')}
             />
@@ -196,7 +192,7 @@ export function CreateLinkForm() {
               className={cn(inputClasses, errors.maxClicks && 'border-error')}
               id="maxClicks"
               min={1}
-              placeholder="500"
+              placeholder="ex: 500"
               type="number"
               {...register('maxClicks')}
             />

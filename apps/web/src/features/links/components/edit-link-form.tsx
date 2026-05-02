@@ -102,7 +102,6 @@ export function EditLinkForm({ link }: EditLinkFormProps) {
               className={cn(inputClasses, errors.title && 'border-error')}
               id="title"
               maxLength={120}
-              placeholder="Backend article"
               type="text"
               {...register('title')}
             />
@@ -125,7 +124,6 @@ export function EditLinkForm({ link }: EditLinkFormProps) {
               )}
               id="description"
               maxLength={500}
-              placeholder="Optional context for this link"
               {...register('description')}
             />
             {errors.description ? (
@@ -164,7 +162,7 @@ export function EditLinkForm({ link }: EditLinkFormProps) {
               className={cn(inputClasses, errors.maxClicks && 'border-error')}
               id="maxClicks"
               min={1}
-              placeholder="1000"
+              placeholder="ex: 500"
               type="number"
               {...register('maxClicks')}
             />
