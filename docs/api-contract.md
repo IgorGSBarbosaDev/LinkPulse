@@ -381,11 +381,19 @@ PATCH /api/v1/links/:id
 ```json
 {
   "id": "uuid",
+  "originalUrl": "https://example.com/artigo-backend",
+  "shortCode": "backend-artigo",
+  "customAlias": "backend-artigo",
+  "shortUrl": "http://localhost:3000/r/backend-artigo",
   "title": "Novo título",
   "description": "Nova descrição",
   "active": true,
+  "expired": false,
+  "reachedMaxClicks": false,
   "expiresAt": "2026-06-30T23:59:59.000Z",
   "maxClicks": 1000,
+  "clickCount": 120,
+  "createdAt": "2026-04-23T20:00:00.000Z",
   "updatedAt": "2026-04-23T21:00:00.000Z"
 }
 ```
@@ -422,7 +430,19 @@ PATCH /api/v1/links/:id/activate
 ```json
 {
   "id": "uuid",
+  "originalUrl": "https://example.com/artigo-backend",
+  "shortCode": "backend-artigo",
+  "customAlias": "backend-artigo",
+  "shortUrl": "http://localhost:3000/r/backend-artigo",
+  "title": "Artigo sobre Backend",
+  "description": "Conteúdo sobre arquitetura backend",
   "active": true,
+  "expired": false,
+  "reachedMaxClicks": false,
+  "expiresAt": "2026-05-30T23:59:59.000Z",
+  "maxClicks": 500,
+  "clickCount": 120,
+  "createdAt": "2026-04-23T20:00:00.000Z",
   "updatedAt": "2026-04-23T21:00:00.000Z"
 }
 ```
@@ -440,7 +460,19 @@ PATCH /api/v1/links/:id/deactivate
 ```json
 {
   "id": "uuid",
+  "originalUrl": "https://example.com/artigo-backend",
+  "shortCode": "backend-artigo",
+  "customAlias": "backend-artigo",
+  "shortUrl": "http://localhost:3000/r/backend-artigo",
+  "title": "Artigo sobre Backend",
+  "description": "Conteúdo sobre arquitetura backend",
   "active": false,
+  "expired": false,
+  "reachedMaxClicks": false,
+  "expiresAt": "2026-05-30T23:59:59.000Z",
+  "maxClicks": 500,
+  "clickCount": 120,
+  "createdAt": "2026-04-23T20:00:00.000Z",
   "updatedAt": "2026-04-23T21:00:00.000Z"
 }
 ```
@@ -591,12 +623,16 @@ GET /api/v1/analytics/top-links
 GET /health
 ```
 
-### Response `200`
+### Response `200` ou `503`
 
 ```json
 {
   "status": "ok",
-  "app": "LinkPulse API"
+  "app": "LinkPulse API",
+  "dependencies": {
+    "postgres": "up",
+    "redis": "up"
+  }
 }
 ```
 
