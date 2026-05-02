@@ -37,7 +37,7 @@ export function LinkAnalyticsPage() {
   return (
     <PageContainer
       title="Link analytics"
-      description="Track clicks, recent access events, and daily performance."
+      description="Track link summary, daily clicks trend, and latest access events."
       actions={
         id ? (
           <div className="flex items-center gap-2">
@@ -56,7 +56,7 @@ export function LinkAnalyticsPage() {
         ) : null
       }
     >
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-6">
         {summaryQuery.isLoading ? <LoadingState label="Loading analytics" /> : null}
 
         {summaryQuery.isError && blockingError?.code === 'FORBIDDEN' ? (
@@ -85,12 +85,18 @@ export function LinkAnalyticsPage() {
           <>
             <AnalyticsSummaryCards summary={summaryQuery.data} />
 
-            <div className="rounded-lg border border-border bg-card p-4">
+            <div className="rounded-lg border border-border bg-card">
+              <div className="border-b border-border bg-surface px-4 py-3">
+                <h2 className="text-sm font-semibold uppercase tracking-label text-foreground">
+                  Link metadata
+                </h2>
+              </div>
+              <div className="p-4">
               <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
                 <div className="flex flex-col gap-1">
-                  <h2 className="text-lg font-semibold text-foreground">
+                  <h3 className="text-base font-semibold text-foreground">
                     Date range
-                  </h2>
+                  </h3>
                   <p className="text-sm text-muted-foreground">
                     Query clicks by day with backend date filters.
                   </p>
@@ -129,6 +135,7 @@ export function LinkAnalyticsPage() {
                     />
                   </label>
                 </div>
+              </div>
               </div>
             </div>
 

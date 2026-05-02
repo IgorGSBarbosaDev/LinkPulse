@@ -45,12 +45,12 @@ export function ClicksByDayChart({
           {title}
         </h2>
       </div>
-      <div className="px-4 pb-4 pt-3">
+      <div className="px-4 pb-3 pt-3">
         <p className="text-sm text-muted-foreground">
           Daily tracked clicks for selected range.
         </p>
       </div>
-      <div className="h-72 px-2 pb-3">
+      <div className="h-72 px-2 pb-2">
         <ResponsiveContainer height="100%" width="100%">
           <AreaChart data={data} margin={{ bottom: 0, left: 6, right: 8, top: 0 }}>
             <CartesianGrid stroke="var(--color-border)" strokeDasharray="3 3" />

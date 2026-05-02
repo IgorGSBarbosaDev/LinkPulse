@@ -15,10 +15,16 @@ export function AccountSettingsCard({
   return (
     <section
       aria-label="Account profile"
-      className="rounded-lg border border-border bg-card p-5"
+      className="rounded-lg border border-border bg-card"
     >
+      <div className="border-b border-border bg-surface px-5 py-3">
+        <h2 className="text-sm font-semibold uppercase tracking-label text-foreground">
+          Profile & security
+        </h2>
+      </div>
+      <div className="p-5">
       <div className="mb-4 flex items-center gap-3">
-        <span className="rounded-md border border-border bg-background p-2 text-muted-foreground">
+        <span className="rounded-md border border-border bg-card p-2 text-muted-foreground">
           <UserRound aria-hidden="true" className="size-4" />
         </span>
         <div>
@@ -49,6 +55,7 @@ export function AccountSettingsCard({
           <LogOut aria-hidden="true" className="size-4" />
           Logout
         </Button>
+      </div>
       </div>
     </section>
   )

@@ -37,25 +37,25 @@ export function AccessEventsTable({
 
   return (
     <div className="overflow-hidden rounded-lg border border-border bg-card">
-      <div className="border-b border-border p-4">
-        <h2 className="text-base font-semibold text-foreground">
+      <div className="border-b border-border bg-surface px-4 py-3">
+        <h2 className="text-sm font-semibold uppercase tracking-label text-foreground">
           Latest access events
         </h2>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[860px] border-collapse text-left">
-          <thead className="bg-background">
+          <thead className="bg-card">
             <tr className="border-b border-border">
-              <th className="px-4 py-3 text-xs font-medium uppercase tracking-label text-muted-foreground">
+              <th className="px-4 py-2.5 text-xs font-medium uppercase tracking-label text-muted-foreground">
                 Accessed at
               </th>
-              <th className="px-4 py-3 text-xs font-medium uppercase tracking-label text-muted-foreground">
+              <th className="px-4 py-2.5 text-xs font-medium uppercase tracking-label text-muted-foreground">
                 IP address
               </th>
-              <th className="px-4 py-3 text-xs font-medium uppercase tracking-label text-muted-foreground">
+              <th className="px-4 py-2.5 text-xs font-medium uppercase tracking-label text-muted-foreground">
                 User agent
               </th>
-              <th className="px-4 py-3 text-xs font-medium uppercase tracking-label text-muted-foreground">
+              <th className="px-4 py-2.5 text-xs font-medium uppercase tracking-label text-muted-foreground">
                 Referer
               </th>
             </tr>
@@ -63,21 +63,21 @@ export function AccessEventsTable({
           <tbody>
             {events.map((event) => (
               <tr
-                className="border-b border-border last:border-b-0 hover:bg-muted"
+                className="border-b border-border last:border-b-0 hover:bg-surface"
                 key={event.id}
               >
-                <td className="px-4 py-3 font-mono text-xs text-foreground">
+                <td className="px-4 py-2.5 font-mono text-xs text-foreground">
                   {formatDateTime(event.accessedAt)}
                 </td>
-                <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
+                <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground">
                   {displayValue(event.ipAddress)}
                 </td>
-                <td className="max-w-96 px-4 py-3 text-sm text-muted-foreground">
+                <td className="max-w-96 px-4 py-2.5 text-sm text-muted-foreground">
                   <span className="line-clamp-2">
                     {displayValue(event.userAgent)}
                   </span>
                 </td>
-                <td className="max-w-72 px-4 py-3 text-sm text-muted-foreground">
+                <td className="max-w-72 px-4 py-2.5 text-sm text-muted-foreground">
                   {event.referer ? (
                     <a
                       className="inline-flex max-w-full items-center gap-2 truncate hover:text-foreground hover:underline"
@@ -97,7 +97,7 @@ export function AccessEventsTable({
           </tbody>
         </table>
       </div>
-      <div className="flex flex-col gap-3 border-t border-border p-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 border-t border-border bg-card p-3 sm:flex-row sm:items-center sm:justify-between">
         <span className="text-sm text-muted-foreground">
           Page {pagination.page} of {pagination.totalPages}
         </span>

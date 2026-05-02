@@ -5,7 +5,7 @@ export function CreateLinkPage() {
   return (
     <PageContainer
       title="Create link"
-      description="Create a short link with optional alias, expiration, and click limit."
+      description="Create new short link with optional alias, expiration, and click limit."
     >
       <CreateLinkForm />
     </PageContainer>

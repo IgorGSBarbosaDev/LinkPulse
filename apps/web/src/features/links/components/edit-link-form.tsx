@@ -16,7 +16,7 @@ import {
 import type { LinkDetails } from '../types'
 
 const inputClasses =
-  'h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-ring'
+  'h-9 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-ring'
 
 const textAreaClasses =
   'min-h-24 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-ring'
@@ -75,12 +75,17 @@ export function EditLinkForm({ link }: EditLinkFormProps) {
 
   return (
     <form
-      className="rounded-lg border border-border bg-card p-5"
+      className="rounded-lg border border-border bg-card"
       noValidate
       onSubmit={handleSubmit(onSubmit)}
     >
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)]">
-        <div className="flex flex-col gap-5">
+      <div className="border-b border-border bg-surface px-5 py-3">
+        <h2 className="text-sm font-semibold uppercase tracking-label text-foreground">
+          Link configuration
+        </h2>
+      </div>
+      <div className="grid gap-5 p-5 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)]">
+        <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             <label
               className="text-xs font-medium uppercase tracking-label text-muted-foreground"
@@ -124,7 +129,7 @@ export function EditLinkForm({ link }: EditLinkFormProps) {
           </div>
         </div>
 
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             <label
               className="text-xs font-medium uppercase tracking-label text-muted-foreground"
@@ -172,11 +177,14 @@ export function EditLinkForm({ link }: EditLinkFormProps) {
                 Inactive links will not redirect.
               </span>
             </span>
-            <input
-              className="size-4 accent-primary"
-              type="checkbox"
-              {...register('active')}
-            />
+            <span className="relative inline-flex h-5 w-10 items-center rounded-full border border-border bg-card">
+              <input
+                className="peer sr-only"
+                type="checkbox"
+                {...register('active')}
+              />
+              <span className="absolute left-0.5 h-4 w-4 rounded-full bg-muted-foreground transition-transform peer-checked:translate-x-5 peer-checked:bg-foreground" />
+            </span>
           </label>
           {errors.active ? (
             <p className="text-sm text-error">{errors.active.message}</p>
@@ -185,14 +193,14 @@ export function EditLinkForm({ link }: EditLinkFormProps) {
       </div>
 
       {errors.root ? (
-        <div className="mt-5 rounded-md border border-border bg-background p-3 text-sm text-error">
+        <div className="mx-5 mt-5 rounded-md border border-border bg-background p-3 text-sm text-error">
           {errors.root.message}
         </div>
       ) : null}
 
-      <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mt-6 flex flex-col-reverse gap-3 border-t border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
         <Link
-          className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-border bg-card px-4 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+          className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-border bg-card px-4 text-xs font-medium uppercase tracking-label text-foreground transition-colors hover:bg-muted"
           to={`/links/${link.id}`}
         >
           <ArrowLeft aria-hidden="true" className="size-4" />

@@ -37,7 +37,7 @@ function DetailItem({
   value: string | number
 }) {
   return (
-    <div className="flex min-w-0 flex-col gap-1 rounded-md border border-border bg-background p-3">
+    <div className="flex min-w-0 flex-col gap-1 rounded-md border border-border bg-card p-3">
       <span className="text-xs font-medium uppercase tracking-label text-muted-foreground">
         {label}
       </span>
@@ -52,14 +52,20 @@ export function LinkDetailsCard({ link }: LinkDetailsCardProps) {
   const displayTitle = link.title || link.shortCode
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="rounded-lg border border-border bg-card p-5">
+    <div className="flex flex-col gap-5">
+      <div className="rounded-lg border border-border bg-card">
+        <div className="border-b border-border bg-surface px-5 py-3">
+          <h2 className="text-sm font-semibold uppercase tracking-label text-foreground">
+            Link overview
+          </h2>
+        </div>
+        <div className="p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="flex min-w-0 flex-col gap-3">
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="break-words text-2xl font-semibold text-foreground">
+              <h3 className="break-words text-2xl font-semibold text-foreground">
                 {displayTitle}
-              </h2>
+              </h3>
               <LinkStatusBadge link={link} />
             </div>
             <a
@@ -72,7 +78,7 @@ export function LinkDetailsCard({ link }: LinkDetailsCardProps) {
             </a>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 rounded-md border border-border bg-background px-1 py-1">
             <CopyShortUrlButton shortUrl={link.shortUrl} />
             <Link to={`/links/${link.id}/edit`}>
               <Button size="sm" variant="secondary">
@@ -94,6 +100,7 @@ export function LinkDetailsCard({ link }: LinkDetailsCardProps) {
             {link.description}
           </p>
         ) : null}
+        </div>
       </div>
 
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
@@ -132,7 +139,7 @@ export function LinkDetailsCard({ link }: LinkDetailsCardProps) {
 
       <div className="flex flex-wrap items-center gap-2">
         <Link
-          className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-border bg-card px-3 text-xs font-medium text-foreground transition-colors hover:bg-muted"
+          className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-border bg-card px-3 text-xs font-medium uppercase tracking-label text-foreground transition-colors hover:bg-muted"
           to="/links"
         >
           <ArrowLeft aria-hidden="true" className="size-4" />

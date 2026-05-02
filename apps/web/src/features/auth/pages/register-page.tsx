@@ -5,9 +5,14 @@ import { RegisterForm } from '../components/register-form'
 export function RegisterPage() {
   return (
     <main className="flex min-h-svh items-center justify-center bg-background px-4 py-10 text-foreground">
-      <section className="w-full max-w-md rounded-lg border border-border bg-card p-5">
+      <section className="w-full max-w-md rounded-lg border border-border bg-card">
+        <div className="border-b border-border bg-surface px-5 py-3">
+          <p className="font-mono text-xs font-semibold uppercase tracking-label text-muted-foreground">
+            LinkPulse
+          </p>
+        </div>
+        <div className="p-5">
         <div className="flex flex-col gap-2">
-          <p className="font-mono text-sm font-semibold">LinkPulse</p>
           <h1 className="text-[2rem] font-semibold leading-tight">Create account</h1>
           <p className="text-sm leading-6 text-muted-foreground">
             Create a workspace login for short links and analytics.
@@ -23,6 +28,7 @@ export function RegisterPage() {
           >
             Back home
           </Link>
+        </div>
         </div>
       </section>
     </main>

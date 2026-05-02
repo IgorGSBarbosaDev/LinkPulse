@@ -17,7 +17,7 @@ export function EditLinkPage() {
   return (
     <PageContainer
       title="Edit link"
-      description="Update metadata, expiration, click limit, and active status."
+      description="Update metadata, limits, expiration, and active status."
     >
       {linkQuery.isLoading ? <LoadingState label="Loading link" /> : null}
 

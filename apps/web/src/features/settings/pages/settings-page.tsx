@@ -16,7 +16,7 @@ export function SettingsPage() {
       title="Settings"
       description="Account profile and session controls."
     >
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-5">
         {isLoadingSession ? <LoadingState label="Loading account" /> : null}
 
         {!isLoadingSession && sessionError?.code === 'FORBIDDEN' ? (

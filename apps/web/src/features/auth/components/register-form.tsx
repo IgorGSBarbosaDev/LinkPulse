@@ -10,7 +10,7 @@ import { useAuth } from '../hooks/use-auth'
 import { registerSchema, type RegisterFormValues } from '../schemas/auth-schemas'
 
 const inputClasses =
-  'h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-ring'
+  'h-9 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-ring'
 
 export function RegisterForm() {
   const { isRegistering, registerAsync } = useAuth()
@@ -42,7 +42,7 @@ export function RegisterForm() {
   }
 
   return (
-    <form className="flex flex-col gap-5" noValidate onSubmit={handleSubmit(onSubmit)}>
+    <form className="flex flex-col gap-4" noValidate onSubmit={handleSubmit(onSubmit)}>
       <div className="flex flex-col gap-2">
         <label className="text-xs font-medium uppercase tracking-label text-muted-foreground" htmlFor="name">
           Name
@@ -97,7 +97,7 @@ export function RegisterForm() {
         </div>
       ) : null}
 
-      <Button disabled={isRegistering} type="submit" variant="primary">
+      <Button className="uppercase tracking-label" disabled={isRegistering} type="submit" variant="primary">
         {isRegistering ? 'Creating account...' : 'Create account'}
       </Button>
 

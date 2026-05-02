@@ -14,7 +14,7 @@ import {
 } from '../schemas/link-schemas'
 
 const inputClasses =
-  'h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-ring'
+  'h-9 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-ring'
 
 const textAreaClasses =
   'min-h-24 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-ring'
@@ -69,12 +69,17 @@ export function CreateLinkForm() {
 
   return (
     <form
-      className="rounded-lg border border-border bg-card p-5"
+      className="rounded-lg border border-border bg-card"
       noValidate
       onSubmit={handleSubmit(onSubmit)}
     >
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)]">
-        <div className="flex flex-col gap-5">
+      <div className="border-b border-border bg-surface px-5 py-3">
+        <h2 className="text-sm font-semibold uppercase tracking-label text-foreground">
+          Link configuration
+        </h2>
+      </div>
+      <div className="grid gap-5 p-5 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)]">
+        <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             <label
               className="text-xs font-medium uppercase tracking-label text-muted-foreground"
@@ -137,7 +142,7 @@ export function CreateLinkForm() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             <label
               className="text-xs font-medium uppercase tracking-label text-muted-foreground"
@@ -203,14 +208,14 @@ export function CreateLinkForm() {
       </div>
 
       {errors.root ? (
-        <div className="mt-5 rounded-md border border-border bg-background p-3 text-sm text-error">
+        <div className="mx-5 mt-5 rounded-md border border-border bg-background p-3 text-sm text-error">
           {errors.root.message}
         </div>
       ) : null}
 
-      <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mt-6 flex flex-col-reverse gap-3 border-t border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
         <Link
-          className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-border bg-card px-4 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+          className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-border bg-card px-4 text-xs font-medium uppercase tracking-label text-foreground transition-colors hover:bg-muted"
           to="/links"
         >
           <ArrowLeft aria-hidden="true" className="size-4" />
