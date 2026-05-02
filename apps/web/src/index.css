@@ -54,6 +54,12 @@ body {
   background: var(--color-background);
 }
 
+h1,
+h2,
+h3 {
+  margin: 0;
+}
+
 button,
 input,
 textarea,

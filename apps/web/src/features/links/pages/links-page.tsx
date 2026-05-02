@@ -47,15 +47,14 @@ export function LinksPage() {
       title="Links"
       description="Manage short links, search by URL or title, and control active state."
       actions={
-        <Link
-          className="rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          to="/links/new"
-        >
-          New link
+        <Link to="/links/new">
+          <Button size="sm" variant="primary">
+            New link
+          </Button>
         </Link>
       }
     >
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-5">
         <LinkFilters filters={filters} onChange={updateFilters} />
 
         {linksQuery.isLoading ? <LoadingState label="Loading links" /> : null}
@@ -99,11 +98,10 @@ export function LinksPage() {
               title="No links yet"
               description="Create your first short link to start tracking clicks."
               action={
-                <Link
-                  className="rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-                  to="/links/new"
-                >
-                  New link
+                <Link to="/links/new">
+                  <Button size="sm" variant="primary">
+                    New link
+                  </Button>
                 </Link>
               }
             />

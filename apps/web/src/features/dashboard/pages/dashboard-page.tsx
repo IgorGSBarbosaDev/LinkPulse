@@ -34,7 +34,7 @@ export function DashboardPage() {
         </Link>
       }
     >
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-5">
         {dashboardQuery.isLoading ? (
           <LoadingState label="Loading dashboard" />
         ) : null}
@@ -99,7 +99,7 @@ export function DashboardPage() {
                 title="All links clicks by day"
               />
 
-              <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(360px,0.7fr)]">
+              <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(360px,0.7fr)]">
                 <RecentClicksTable events={dashboard.recentEvents} />
                 <TopLinksTable links={dashboard.topLinks} />
               </div>

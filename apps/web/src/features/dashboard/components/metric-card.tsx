@@ -14,7 +14,7 @@ export function MetricCard({ icon: Icon, label, value }: MetricCardProps) {
           <span className="text-xs font-medium uppercase tracking-label text-muted-foreground">
             {label}
           </span>
-          <span className="font-mono text-2xl font-semibold text-foreground">
+          <span className="font-mono text-[1.75rem] font-semibold leading-tight text-foreground">
             {new Intl.NumberFormat('en').format(value)}
           </span>
         </div>

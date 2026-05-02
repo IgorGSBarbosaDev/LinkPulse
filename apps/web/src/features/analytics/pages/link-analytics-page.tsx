@@ -56,7 +56,7 @@ export function LinkAnalyticsPage() {
         ) : null
       }
     >
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-5">
         {summaryQuery.isLoading ? <LoadingState label="Loading analytics" /> : null}
 
         {summaryQuery.isError && blockingError?.code === 'FORBIDDEN' ? (
@@ -88,7 +88,7 @@ export function LinkAnalyticsPage() {
             <div className="rounded-lg border border-border bg-card p-4">
               <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
                 <div className="flex flex-col gap-1">
-                  <h2 className="text-base font-semibold text-foreground">
+                  <h2 className="text-lg font-semibold text-foreground">
                     Date range
                   </h2>
                   <p className="text-sm text-muted-foreground">

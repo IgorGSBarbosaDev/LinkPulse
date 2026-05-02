@@ -4,11 +4,11 @@ import { LoginForm } from '../components/login-form'
 
 export function LoginPage() {
   return (
-    <main className="flex min-h-svh items-center justify-center bg-background px-4 py-8 text-foreground">
-      <section className="w-full max-w-md rounded-lg border border-border bg-card p-6">
+    <main className="flex min-h-svh items-center justify-center bg-background px-4 py-10 text-foreground">
+      <section className="w-full max-w-md rounded-lg border border-border bg-card p-5">
         <div className="flex flex-col gap-2">
           <p className="font-mono text-sm font-semibold">LinkPulse</p>
-          <h1 className="text-2xl font-semibold">Login</h1>
+          <h1 className="text-[2rem] font-semibold leading-tight">Login</h1>
           <p className="text-sm leading-6 text-muted-foreground">
             Sign in with your email and password to manage links and analytics.
           </p>

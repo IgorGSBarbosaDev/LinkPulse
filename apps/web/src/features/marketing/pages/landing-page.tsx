@@ -12,25 +12,25 @@ export function LandingPage() {
           </span>
           <div className="flex items-center gap-2">
             <Link
-              className="rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              className="rounded-md px-3 py-2 text-xs font-medium uppercase tracking-label text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               to="/login"
             >
               Login
             </Link>
             <Link
-              className="rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+              className="rounded-md bg-primary px-3 py-2 text-xs font-medium uppercase tracking-label text-primary-foreground transition-colors hover:bg-primary/90"
               to="/register"
             >
               Register
             </Link>
           </div>
         </nav>
-        <div className="grid gap-8 py-20 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-end">
+        <div className="grid gap-8 py-16 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-end">
           <div className="flex max-w-3xl flex-col gap-5">
             <p className="text-xs font-medium uppercase tracking-label text-muted-foreground">
               Short links + analytics
             </p>
-            <h1 className="text-4xl font-semibold leading-tight text-foreground md:text-5xl">
+            <h1 className="text-5xl font-semibold leading-tight text-foreground">
               LinkPulse
             </h1>
             <p className="max-w-2xl text-base leading-7 text-muted-foreground">
