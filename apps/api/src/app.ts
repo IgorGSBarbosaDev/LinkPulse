@@ -20,11 +20,36 @@ dotenv.config()
 
 export const app = express()
 
+function isAllowedDevelopmentOrigin(origin: string) {
+  try {
+    const url = new URL(origin)
+
+    return ['localhost', '127.0.0.1', '[::1]', '::1'].includes(url.hostname)
+  } catch {
+    return false
+  }
+}
+
 app.use(helmet())
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL ?? 'http://localhost:5173',
+    origin(origin, callback) {
+      const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:5173'
+
+      if (!origin || origin === frontendUrl) {
+        return callback(null, true)
+      }
+
+      if (
+        process.env.NODE_ENV !== 'production' &&
+        isAllowedDevelopmentOrigin(origin)
+      ) {
+        return callback(null, true)
+      }
+
+      return callback(new Error('Origin not allowed by CORS'))
+    },
   }),
 )
 
