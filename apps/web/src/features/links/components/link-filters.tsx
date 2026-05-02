@@ -55,7 +55,7 @@ export function LinkFilters({ filters, onChange }: LinkFiltersProps) {
         <label className="flex items-center gap-2 rounded-md border border-border bg-background px-2.5 py-1.5 text-xs text-muted-foreground">
           <span className="uppercase tracking-label">Sort</span>
           <select
-            className="bg-transparent text-xs text-foreground outline-none"
+            className="appearance-none rounded-sm border border-transparent bg-transparent px-1.5 py-0.5 text-xs text-foreground outline-none transition-colors focus:border-ring"
             onChange={(event) =>
               onChange({
                 sort: event.target.value as LinksFilters['sort'],

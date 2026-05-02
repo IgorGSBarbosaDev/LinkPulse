@@ -30,6 +30,7 @@
 :root {
   color: var(--color-foreground);
   background: var(--color-background);
+  color-scheme: dark;
   font-family: var(--font-sans);
   font-size: 14px;
   font-synthesis: none;
@@ -65,6 +66,23 @@ input,
 textarea,
 select {
   font: inherit;
+}
+
+input[type="date"],
+input[type="datetime-local"],
+select {
+  color-scheme: dark;
+}
+
+select option {
+  background: var(--color-card);
+  color: var(--color-foreground);
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.85);
+  opacity: 0.9;
 }
 
 a {
