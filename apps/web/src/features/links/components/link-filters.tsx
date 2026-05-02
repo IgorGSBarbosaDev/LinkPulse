@@ -22,7 +22,7 @@ export function LinkFilters({ filters, onChange }: LinkFiltersProps) {
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-4 lg:flex-row lg:items-center lg:justify-between">
+    <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-3.5 lg:flex-row lg:items-center lg:justify-between">
       <label className="relative flex min-w-0 flex-1">
         <Search
           aria-hidden="true"
@@ -30,16 +30,17 @@ export function LinkFilters({ filters, onChange }: LinkFiltersProps) {
         />
         <span className="sr-only">Search links</span>
         <input
-          className="h-10 w-full rounded-md border border-border bg-background pl-9 pr-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-ring"
+          className="h-9 w-full rounded-md border border-border bg-background pl-9 pr-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-ring"
           onChange={handleSearchChange}
           placeholder="Search by title, short code, or URL"
           value={filters.search}
         />
       </label>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-1.5">
         {statusOptions.map((option) => (
           <Button
             className={cn(
+              'uppercase tracking-label',
               filters.active === option.value &&
                 'border-primary bg-primary text-primary-foreground hover:bg-primary/90',
             )}

@@ -45,9 +45,14 @@ export function LinksTable({
 }: LinksTableProps) {
   return (
     <div className="overflow-hidden rounded-lg border border-border bg-card">
+      <div className="border-b border-border bg-surface px-4 py-3">
+        <h2 className="text-sm font-semibold uppercase tracking-label text-foreground">
+          Links management
+        </h2>
+      </div>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[980px] border-collapse text-left">
-          <thead className="bg-surface">
+          <thead className="bg-card">
             <tr className="border-b border-border">
               <th className="px-4 py-2.5 text-xs font-medium uppercase tracking-label text-muted-foreground">
                 Title
@@ -93,7 +98,7 @@ export function LinksTable({
                 </td>
                 <td className="max-w-56 px-4 py-2.5 align-top">
                   <a
-                    className="block truncate font-mono text-xs text-foreground hover:underline"
+                    className="block truncate font-mono text-xs text-foreground hover:text-primary hover:underline"
                     href={link.shortUrl}
                     rel="noreferrer"
                     target="_blank"
@@ -115,7 +120,7 @@ export function LinksTable({
                   <LinkStatusBadge link={link} />
                 </td>
                 <td className="px-4 py-2.5 align-top">
-                  <span className="inline-flex items-center gap-2 font-mono text-sm text-foreground">
+                  <span className="inline-flex items-center gap-1.5 font-mono text-sm text-foreground">
                     <Activity aria-hidden="true" className="size-4 text-muted-foreground" />
                     {link.clickCount}
                   </span>
@@ -127,7 +132,7 @@ export function LinksTable({
                   {formatDate(link.createdAt)}
                 </td>
                 <td className="px-4 py-2.5 align-top">
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 rounded-md border border-border bg-background px-1 py-0.5">
                     <CopyShortUrlButton shortUrl={link.shortUrl} />
                     <Link to={`/links/${link.id}`}>
                       <Button aria-label="View details" size="sm" variant="ghost">

@@ -34,7 +34,13 @@ export function CopyShortUrlButton({ shortUrl }: CopyShortUrlButtonProps) {
   }
 
   return (
-    <Button aria-label="Copy short URL" onClick={handleCopy} size="sm" variant="ghost">
+    <Button
+      aria-label="Copy short URL"
+      className="border border-transparent hover:border-border"
+      onClick={handleCopy}
+      size="sm"
+      variant="ghost"
+    >
       <Copy aria-hidden="true" className="size-4" />
     </Button>
   )

@@ -45,7 +45,7 @@ export function LinksPage() {
   return (
     <PageContainer
       title="Links"
-      description="Manage short links, search by URL or title, and control active state."
+      description="Manage short links, filter by status, and run quick actions."
       actions={
         <Link to="/links/new">
           <Button size="sm" variant="primary">
@@ -54,7 +54,7 @@ export function LinksPage() {
         </Link>
       }
     >
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-6">
         <LinkFilters filters={filters} onChange={updateFilters} />
 
         {linksQuery.isLoading ? <LoadingState label="Loading links" /> : null}

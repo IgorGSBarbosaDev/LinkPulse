@@ -18,7 +18,7 @@ export function LinksPagination({
   )
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-3.5 sm:flex-row sm:items-center sm:justify-between">
       <p className="text-sm text-muted-foreground">
         Showing {startItem}-{endItem} of {pagination.totalItems}
       </p>
@@ -31,7 +31,7 @@ export function LinksPagination({
         >
           Previous
         </Button>
-        <span className="font-mono text-xs text-muted-foreground">
+        <span className="font-mono text-xs uppercase tracking-label text-muted-foreground">
           Page {pagination.page} / {Math.max(pagination.totalPages, 1)}
         </span>
         <Button

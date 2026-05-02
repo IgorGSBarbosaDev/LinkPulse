@@ -11,10 +11,10 @@ export function LinkStatusBadge({ link }: LinkStatusBadgeProps) {
   return (
     <span
       className={cn(
-        'inline-flex h-7 items-center rounded-md border px-2 font-mono text-xs',
+        'inline-flex h-6 items-center rounded-md border px-2 font-mono text-xs uppercase tracking-label',
         link.active && !link.expired
-          ? 'border-primary text-foreground'
-          : 'border-border text-muted-foreground',
+          ? 'border-primary bg-surface text-foreground'
+          : 'border-border bg-background text-muted-foreground',
         link.expired && 'line-through',
       )}
     >
