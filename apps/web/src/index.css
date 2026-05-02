@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap");
 @import "tailwindcss";
 
 @theme {
@@ -93,4 +94,14 @@ a {
 ::selection {
   background: var(--color-primary);
   color: var(--color-primary-foreground);
+}
+
+.material-symbols-outlined {
+  font-variation-settings:
+    "FILL" 0,
+    "wght" 400,
+    "GRAD" 0,
+    "opsz" 24;
+  font-family: "Material Symbols Outlined", sans-serif;
+  line-height: 1;
 }
