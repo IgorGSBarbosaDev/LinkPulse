@@ -42,7 +42,7 @@ export function RegisterForm() {
   }
 
   return (
-    <form className="flex flex-col gap-5" onSubmit={handleSubmit(onSubmit)}>
+    <form className="flex flex-col gap-5" noValidate onSubmit={handleSubmit(onSubmit)}>
       <div className="flex flex-col gap-2">
         <label className="text-xs font-medium uppercase tracking-label text-muted-foreground" htmlFor="name">
           Name

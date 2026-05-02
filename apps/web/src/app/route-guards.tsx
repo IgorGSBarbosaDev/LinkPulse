@@ -5,7 +5,7 @@ import { useAuth } from '../features/auth/hooks/use-auth'
 
 export function ProtectedRoute() {
   const location = useLocation()
-  const { isAuthenticated, isLoadingSession, token } = useAuth()
+  const { hasToken, isLoadingSession } = useAuth()
 
   if (isLoadingSession) {
     return (
@@ -17,7 +17,7 @@ export function ProtectedRoute() {
     )
   }
 
-  if (!token || !isAuthenticated) {
+  if (!hasToken) {
     return <Navigate replace state={{ from: location }} to="/login" />
   }
 
@@ -25,7 +25,7 @@ export function ProtectedRoute() {
 }
 
 export function PublicRoute() {
-  const { isAuthenticated, isLoadingSession, token } = useAuth()
+  const { hasToken, isAuthenticated, isLoadingSession } = useAuth()
 
   if (isLoadingSession) {
     return (
@@ -37,7 +37,7 @@ export function PublicRoute() {
     )
   }
 
-  if (token && isAuthenticated) {
+  if (hasToken && isAuthenticated) {
     return <Navigate replace to="/dashboard" />
   }
 
