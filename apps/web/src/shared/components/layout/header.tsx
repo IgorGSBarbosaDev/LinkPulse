@@ -5,32 +5,9 @@ import { useAuth } from '../../../features/auth/hooks/use-auth'
 import { cn } from '../../lib/utils'
 import { Button } from '../ui/button'
 
-const titlesByPath: Record<string, string> = {
-  '/dashboard': 'Dashboard',
-  '/links': 'Links',
-  '/links/new': 'Create link',
-  '/settings': 'Settings',
-}
-
-function getPageTitle(pathname: string) {
-  if (pathname.endsWith('/edit')) {
-    return 'Edit link'
-  }
-
-  if (pathname.endsWith('/analytics')) {
-    return 'Link analytics'
-  }
-
-  if (pathname.startsWith('/links/') && pathname !== '/links/new') {
-    return 'Link details'
-  }
-
-  return titlesByPath[pathname] ?? 'LinkPulse'
-}
-
 export function Header() {
   const location = useLocation()
-  const { logout, user } = useAuth()
+  const { logout } = useAuth()
   const navigationItems = [
     { label: 'Dashboard', to: '/dashboard' },
     { label: 'Links', to: '/links' },
@@ -76,14 +53,6 @@ export function Header() {
           </nav>
         </div>
         <div className="flex items-center gap-2">
-          <div className="hidden flex-col sm:flex">
-            <span className="text-xs font-medium text-foreground">
-              {getPageTitle(location.pathname)}
-            </span>
-            <span className="max-w-44 truncate font-mono text-xs text-muted-foreground">
-              {user?.email}
-            </span>
-          </div>
           <Button onClick={logout} size="sm" variant="ghost">
             <LogOut aria-hidden="true" className="size-4" />
             Logout
