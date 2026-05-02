@@ -52,7 +52,7 @@ export function errorHandler(
     if (error.code === 'P2025') {
         return res.status(404).json({
             statusCode: 404,
-            erroe: ErrorCode.NOT_FOUND,
+            error: ErrorCode.NOT_FOUND,
             message: 'Resource not found',
             details: [],
         })

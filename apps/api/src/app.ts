@@ -8,6 +8,8 @@ import dotenv from 'dotenv'
 import { errorHandler } from './shared/errors/error-handler.js'
 import { notFoundMiddleware } from './shared/middlewares/not-found.middleware.js'
 import { swaggerServe, swaggerSetup } from './shared/config/swagger.js'
+import { prisma } from './shared/config/prisma.js'
+import { redis } from './shared/config/redis.js'
 
 import { authRoutes } from './modules/auth/auth.routes.js'
 import { analyticsRoutes } from './modules/analytics/analytics.routes.js'
@@ -29,10 +31,33 @@ app.use(
 app.use(express.json())
 app.use('/docs', swaggerServe, swaggerSetup)
 
-app.get('/health', (_req, res) => {
-  return res.status(200).json({
-    status: 'ok',
+app.get('/health', async (_req, res) => {
+  let postgres: 'up' | 'down' = 'up'
+  let redisStatus: 'up' | 'down' = 'up'
+
+  try {
+    await prisma.$queryRawUnsafe('SELECT 1')
+  } catch {
+    postgres = 'down'
+  }
+
+  try {
+    await redis.ping()
+  } catch {
+    redisStatus = 'down'
+  }
+
+  const status =
+    postgres === 'down' ? 'down' : redisStatus === 'down' ? 'degraded' : 'ok'
+  const statusCode = postgres === 'down' ? 503 : 200
+
+  return res.status(statusCode).json({
+    status,
     app: 'LinkPulse API',
+    dependencies: {
+      postgres,
+      redis: redisStatus,
+    },
   })
 })
 

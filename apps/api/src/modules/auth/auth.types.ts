@@ -10,8 +10,11 @@ export type AuthUser = {
     name: string
     email: string
 }
+export type RegisteredUser = AuthUser & {
+    createdAt: Date
+}
 export type AuthResponse = {
-    acessToken: string
+    accessToken: string
     tokenType: 'Bearer'
     expiresIn: number
     user: AuthUser

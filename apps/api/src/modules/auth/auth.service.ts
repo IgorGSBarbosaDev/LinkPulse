@@ -1,20 +1,55 @@
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import type { SignOptions } from 'jsonwebtoken'
 import { prisma } from '../../shared/config/prisma.js'
+import { env } from '../../shared/config/env.js'
 import { AppError } from '../../shared/errors/app-error.js'
 import type {
   AuthResponse,
   AuthUser,
   JwtPayload,
   LoginInput,
+  RegisteredUser,
   RegisterInput,
 } from './auth.types.js'
 
 const PASSWORD_SALT_ROUNDS = 10
-const ACCESS_TOKEN_EXPIRES_IN_SECONDS = 3600 // 1 hour
+const DEFAULT_ACCESS_TOKEN_EXPIRES_IN_SECONDS = 3600
+
+function expiresInToSeconds(expiresIn: string): number {
+  if (/^\d+$/.test(expiresIn)) {
+    return Number(expiresIn)
+  }
+
+  const match = expiresIn.trim().match(/^(\d+)([smhd])$/i)
+  if (!match) {
+    throw AppError.internal('Invalid JWT_EXPIRES_IN format.')
+  }
+
+  const amountString = match[1]
+  const unitString = match[2]
+
+  if (!amountString || !unitString) {
+    throw AppError.internal('Invalid JWT_EXPIRES_IN format.')
+  }
+
+  const amount = Number(amountString)
+  const unit = unitString.toLowerCase()
+
+  if (unit === 's') return amount
+  if (unit === 'm') return amount * 60
+  if (unit === 'h') return amount * 60 * 60
+  return amount * 24 * 60 * 60
+}
+
+const JWT_EXPIRES_IN_FOR_SIGN =
+  env.JWT_EXPIRES_IN as NonNullable<SignOptions['expiresIn']>
+
+const ACCESS_TOKEN_EXPIRES_IN_SECONDS =
+  expiresInToSeconds(env.JWT_EXPIRES_IN) || DEFAULT_ACCESS_TOKEN_EXPIRES_IN_SECONDS
 
 export class AuthService {
-  static async register(input: RegisterInput): Promise<AuthUser> {
+  static async register(input: RegisterInput): Promise<RegisteredUser> {
     const existingUser = await prisma.user.findUnique({
       where: {
         email: input.email,
@@ -44,6 +79,7 @@ export class AuthService {
         id: true,
         name: true,
         email: true,
+        createdAt: true,
       },
     })
 
@@ -84,13 +120,13 @@ export class AuthService {
       email: user.email,
     }
 
-    const acessToken = this.generateAcessToken({
+    const accessToken = this.generateAccessToken({
       sub: user.id,
       email: user.email,
     })
 
     return {
-      acessToken,
+      accessToken,
       tokenType: 'Bearer',
       expiresIn: ACCESS_TOKEN_EXPIRES_IN_SECONDS,
       user: authUser,
@@ -120,8 +156,8 @@ export class AuthService {
     return user
   }
 
-  private static generateAcessToken(payload: JwtPayload): string {
-    const secret = process.env.JWT_SECRET
+  private static generateAccessToken(payload: JwtPayload): string {
+    const secret = env.JWT_SECRET
 
     if (!secret) {
       throw new AppError({
@@ -132,7 +168,7 @@ export class AuthService {
     }
 
     return jwt.sign(payload, secret, {
-      expiresIn: ACCESS_TOKEN_EXPIRES_IN_SECONDS,
+      expiresIn: JWT_EXPIRES_IN_FOR_SIGN,
     })
   }
 }

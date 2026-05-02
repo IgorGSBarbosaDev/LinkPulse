@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from 'express'
 import { AuthService } from './auth.service.js'
+import { AppError } from '../../shared/errors/app-error.js'
 import type { LoginInput, RegisterInput } from './auth.types.js'
 
 type AuthenticatedRequest = Request & {
@@ -46,13 +47,7 @@ export class AuthController {
             const userId = req.user?.id
 
             if(!userId){
-                res.status(401).json({
-                    statusCode: 401,
-                    error: 'Unauthorized',
-                    message: 'Authentication required',
-                    details: [],
-                })
-                return
+                throw AppError.unauthorized('Authentication required')
             }
             const user = await AuthService.getCurrentUser(userId)
             res.status(200).json(user)

@@ -31,7 +31,7 @@ describe('POST /api/v1/auth/login', () => {
     })
     loginMock.mockImplementation((_req, res) => {
       res.status(200).json({
-        acessToken: 'token',
+        accessToken: 'token',
         tokenType: 'Bearer',
         expiresIn: 3600,
       })

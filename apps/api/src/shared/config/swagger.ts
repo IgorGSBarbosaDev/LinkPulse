@@ -59,6 +59,16 @@ const swaggerDefinition = {
         },
         required: ['id', 'name', 'email'],
       },
+      RegisteredUser: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid' },
+          name: { type: 'string', example: 'Igor Silva' },
+          email: { type: 'string', format: 'email', example: 'igor@email.com' },
+          createdAt: { type: 'string', format: 'date-time' },
+        },
+        required: ['id', 'name', 'email', 'createdAt'],
+      },
       AuthRegisterRequest: {
         type: 'object',
         properties: {
@@ -79,12 +89,12 @@ const swaggerDefinition = {
       AuthLoginResponse: {
         type: 'object',
         properties: {
-          acessToken: { type: 'string', example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' },
+          accessToken: { type: 'string', example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' },
           tokenType: { type: 'string', example: 'Bearer' },
           expiresIn: { type: 'integer', example: 3600 },
           user: { $ref: '#/components/schemas/User' },
         },
-        required: ['acessToken', 'tokenType', 'expiresIn', 'user'],
+        required: ['accessToken', 'tokenType', 'expiresIn', 'user'],
       },
       Link: {
         type: 'object',
@@ -289,7 +299,7 @@ const swaggerDefinition = {
             description: 'Created',
             content: {
               'application/json': {
-                schema: { $ref: '#/components/schemas/User' },
+                schema: { $ref: '#/components/schemas/RegisteredUser' },
               },
             },
           },
