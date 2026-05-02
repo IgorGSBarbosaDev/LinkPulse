@@ -39,39 +39,50 @@ export function ClicksByDayChart({
   }
 
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
-      <div className="mb-4 flex flex-col gap-1">
-        <h2 className="text-base font-semibold text-foreground">{title}</h2>
+    <div className="rounded-lg border border-border bg-card">
+      <div className="border-b border-border bg-surface px-4 py-3">
+        <h2 className="text-sm font-semibold uppercase tracking-label text-foreground">
+          {title}
+        </h2>
+      </div>
+      <div className="px-4 pb-4 pt-3">
         <p className="text-sm text-muted-foreground">
           Daily tracked clicks for selected range.
         </p>
       </div>
-      <div className="h-72">
+      <div className="h-72 px-2 pb-3">
         <ResponsiveContainer height="100%" width="100%">
-          <AreaChart data={data} margin={{ bottom: 0, left: 0, right: 8, top: 8 }}>
-            <CartesianGrid stroke="hsl(var(--border))" strokeDasharray="3 3" />
+          <AreaChart data={data} margin={{ bottom: 0, left: 6, right: 8, top: 0 }}>
+            <CartesianGrid stroke="var(--color-border)" strokeDasharray="3 3" />
             <XAxis
               axisLine={false}
               dataKey="date"
               tickFormatter={formatDate}
               tickLine={false}
               tickMargin={10}
+              tick={{ fill: 'var(--color-muted-foreground)', fontSize: 11 }}
             />
-            <YAxis allowDecimals={false} axisLine={false} tickLine={false} width={36} />
+            <YAxis
+              allowDecimals={false}
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: 'var(--color-muted-foreground)', fontSize: 11 }}
+              width={36}
+            />
             <Tooltip
               contentStyle={{
-                background: 'hsl(var(--card))',
-                border: '1px solid hsl(var(--border))',
+                background: 'var(--color-card)',
+                border: '1px solid var(--color-border)',
                 borderRadius: 8,
-                color: 'hsl(var(--foreground))',
+                color: 'var(--color-foreground)',
               }}
               labelFormatter={(value) => formatDate(String(value))}
             />
             <Area
               dataKey="clicks"
-              fill="hsl(var(--foreground))"
-              fillOpacity={0.16}
-              stroke="hsl(var(--foreground))"
+              fill="var(--color-foreground)"
+              fillOpacity={0.14}
+              stroke="var(--color-foreground)"
               strokeWidth={2}
               type="monotone"
             />

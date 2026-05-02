@@ -28,25 +28,25 @@ export function RecentClicksTable({ events }: RecentClicksTableProps) {
 
   return (
     <div className="overflow-hidden rounded-lg border border-border bg-card">
-      <div className="border-b border-border p-4">
-        <h2 className="text-base font-semibold text-foreground">
+      <div className="border-b border-border bg-surface px-4 py-3">
+        <h2 className="text-sm font-semibold uppercase tracking-label text-foreground">
           Recent activity
         </h2>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[720px] border-collapse text-left">
-          <thead className="bg-background">
+          <thead className="bg-card">
             <tr className="border-b border-border">
-              <th className="px-4 py-3 text-xs font-medium uppercase tracking-label text-muted-foreground">
+              <th className="px-4 py-2.5 text-xs font-medium uppercase tracking-label text-muted-foreground">
                 Link
               </th>
-              <th className="px-4 py-3 text-xs font-medium uppercase tracking-label text-muted-foreground">
+              <th className="px-4 py-2.5 text-xs font-medium uppercase tracking-label text-muted-foreground">
                 Accessed
               </th>
-              <th className="px-4 py-3 text-xs font-medium uppercase tracking-label text-muted-foreground">
+              <th className="px-4 py-2.5 text-xs font-medium uppercase tracking-label text-muted-foreground">
                 Referer
               </th>
-              <th className="px-4 py-3 text-xs font-medium uppercase tracking-label text-muted-foreground">
+              <th className="px-4 py-2.5 text-xs font-medium uppercase tracking-label text-muted-foreground">
                 Action
               </th>
             </tr>
@@ -54,10 +54,10 @@ export function RecentClicksTable({ events }: RecentClicksTableProps) {
           <tbody>
             {events.map((event) => (
               <tr
-                className="border-b border-border last:border-b-0 hover:bg-muted"
+                className="border-b border-border last:border-b-0 hover:bg-surface"
                 key={event.id}
               >
-                <td className="max-w-72 px-4 py-3">
+                <td className="max-w-72 px-4 py-2.5">
                   <div className="flex min-w-0 flex-col gap-1">
                     <span className="truncate text-sm font-medium text-foreground">
                       {event.title || event.shortCode}
@@ -67,15 +67,15 @@ export function RecentClicksTable({ events }: RecentClicksTableProps) {
                     </span>
                   </div>
                 </td>
-                <td className="px-4 py-3 font-mono text-xs text-foreground">
+                <td className="px-4 py-2.5 font-mono text-xs text-foreground">
                   {formatDateTime(event.accessedAt)}
                 </td>
-                <td className="max-w-80 px-4 py-3 text-sm text-muted-foreground">
+                <td className="max-w-80 px-4 py-2.5 text-sm text-muted-foreground">
                   <span className="block truncate">
                     {event.referer || 'Unknown'}
                   </span>
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-4 py-2.5">
                   <Link to={`/links/${event.linkId}/analytics`}>
                     <Button aria-label="View analytics" size="sm" variant="ghost">
                       <BarChart3 aria-hidden="true" className="size-4" />

@@ -25,7 +25,7 @@ export function DashboardPage() {
   return (
     <PageContainer
       title="Dashboard"
-      description="Portfolio-wide link performance from real API data."
+      description="Portfolio-wide performance across links, clicks, and recent access activity."
       actions={
         <Link to="/links/new">
           <Button size="sm" variant="primary">
@@ -34,7 +34,7 @@ export function DashboardPage() {
         </Link>
       }
     >
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-6">
         {dashboardQuery.isLoading ? (
           <LoadingState label="Loading dashboard" />
         ) : null}
@@ -96,10 +96,10 @@ export function DashboardPage() {
 
               <ClicksByDayChart
                 data={dashboard.clicksByDay}
-                title="All links clicks by day"
+                title="Clicks by day"
               />
 
-              <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(360px,0.7fr)]">
+              <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(360px,0.72fr)]">
                 <RecentClicksTable events={dashboard.recentEvents} />
                 <TopLinksTable links={dashboard.topLinks} />
               </div>
