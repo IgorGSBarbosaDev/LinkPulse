@@ -388,7 +388,7 @@ Para autorizar endpoints protegidos no Swagger UI:
 ```env
 NODE_ENV=development
 PORT=3000
-DATABASE_URL=postgresql://linkpulse:linkpulse@localhost:5432/linkpulse
+DATABASE_URL=postgresql://linkpulse:linkpulse@localhost:55432/linkpulse
 REDIS_URL=redis://localhost:6379
 JWT_SECRET=change-this-secret
 JWT_EXPIRES_IN=1h

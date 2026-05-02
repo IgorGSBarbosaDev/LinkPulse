@@ -1384,7 +1384,7 @@ Arquivo: `apps/api/.env.example`
 NODE_ENV=development
 PORT=3000
 
-DATABASE_URL=postgresql://linkpulse:linkpulse@localhost:5432/linkpulse
+DATABASE_URL=postgresql://linkpulse:linkpulse@localhost:55432/linkpulse
 
 REDIS_URL=redis://localhost:6379
 

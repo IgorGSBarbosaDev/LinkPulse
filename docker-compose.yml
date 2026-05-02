@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: linkpulse
       POSTGRES_PASSWORD: linkpulse
     ports:
-      - "5432:5432"
+      - "55432:5432"
     volumes:
       - linkpulse_postgres_data:/var/lib/postgresql/data
 
