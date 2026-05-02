@@ -33,7 +33,7 @@ class RedirectsService {
       throw AppError.gone('Link has expired.')
     }
 
-    if (hasReachedMaxClicks(link)) {
+    if (dbLink && hasReachedMaxClicks(link)) {
       throw AppError.gone('Link has reached its maximum number of clicks.')
     }
 

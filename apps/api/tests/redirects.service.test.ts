@@ -108,6 +108,124 @@ describe('redirectsService.resolveRedirect', () => {
     ).toHaveBeenCalledTimes(1)
   })
 
+  it('handles repeated cached redirects without throwing 500-style runtime errors', async () => {
+    mockedRedirectCacheService.get.mockResolvedValue({
+      id: 'link-id',
+      originalUrl: 'https://example.com/page',
+      shortCode: 'abc123',
+      active: true,
+      expiresAt: null,
+      maxClicks: null,
+      clickCount: 0,
+    })
+    mockedRedirectsRepository.recordAccessAndIncrementClickCount.mockResolvedValue(
+      undefined,
+    )
+
+    const firstResult = await redirectsService.resolveRedirect({
+      shortCode: 'abc123',
+      metadata: {
+        ipAddress: '127.0.0.1',
+        userAgent: 'vitest-agent',
+        referer: 'https://referrer.test',
+      },
+    })
+    const secondResult = await redirectsService.resolveRedirect({
+      shortCode: 'abc123',
+      metadata: {
+        ipAddress: '127.0.0.1',
+        userAgent: 'vitest-agent',
+        referer: 'https://referrer.test',
+      },
+    })
+
+    expect(firstResult).toEqual({ originalUrl: 'https://example.com/page' })
+    expect(secondResult).toEqual({ originalUrl: 'https://example.com/page' })
+    expect(
+      mockedRedirectsRepository.recordAccessAndIncrementClickCount,
+    ).toHaveBeenCalledTimes(2)
+  })
+
+  it('does not trust stale cached clickCount for maxClicks checks', async () => {
+    mockedRedirectCacheService.get.mockResolvedValue({
+      id: 'link-id',
+      originalUrl: 'https://example.com/page',
+      shortCode: 'abc123',
+      active: true,
+      expiresAt: null,
+      maxClicks: 2,
+      clickCount: 2,
+    })
+    mockedRedirectsRepository.recordAccessAndIncrementClickCount.mockResolvedValue(
+      undefined,
+    )
+
+    const result = await redirectsService.resolveRedirect({
+      shortCode: 'abc123',
+      metadata: {
+        ipAddress: '127.0.0.1',
+        userAgent: 'vitest-agent',
+        referer: 'https://referrer.test',
+      },
+    })
+
+    expect(result).toEqual({ originalUrl: 'https://example.com/page' })
+    expect(
+      mockedRedirectsRepository.recordAccessAndIncrementClickCount,
+    ).toHaveBeenCalledTimes(1)
+  })
+
+  it('invalidates cache when repository rejects stale cached maxClicks on third click', async () => {
+    mockedRedirectCacheService.get.mockResolvedValue({
+      id: 'link-id',
+      originalUrl: 'https://example.com/page',
+      shortCode: 'abc123',
+      active: true,
+      expiresAt: null,
+      maxClicks: 2,
+      clickCount: 0,
+    })
+    mockedRedirectsRepository.recordAccessAndIncrementClickCount
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce(undefined)
+      .mockRejectedValueOnce(AppError.gone('Link is no longer available.'))
+
+    await redirectsService.resolveRedirect({
+      shortCode: 'abc123',
+      metadata: {
+        ipAddress: '127.0.0.1',
+        userAgent: 'vitest-agent',
+        referer: 'https://referrer.test',
+      },
+    })
+    await redirectsService.resolveRedirect({
+      shortCode: 'abc123',
+      metadata: {
+        ipAddress: '127.0.0.1',
+        userAgent: 'vitest-agent',
+        referer: 'https://referrer.test',
+      },
+    })
+
+    await expect(
+      redirectsService.resolveRedirect({
+        shortCode: 'abc123',
+        metadata: {
+          ipAddress: '127.0.0.1',
+          userAgent: 'vitest-agent',
+          referer: 'https://referrer.test',
+        },
+      }),
+    ).rejects.toMatchObject<AppError>({
+      statusCode: 410,
+      error: 'Gone',
+    })
+
+    expect(mockedRedirectCacheService.invalidateMany).toHaveBeenCalledWith([
+      'abc123',
+    ])
+  })
+
   it('throws not found when short code does not exist', async () => {
     mockedRedirectsRepository.findRedirectLinkByShortCode.mockResolvedValue(null)
 

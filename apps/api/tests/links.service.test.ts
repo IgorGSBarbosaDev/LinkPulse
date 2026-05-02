@@ -89,4 +89,20 @@ describe('linksService cache invalidation', () => {
       'abc123',
     ])
   })
+
+  it('invalidates cache when link is saved without changing shortCode', async () => {
+    mockedLinksRepository.update.mockResolvedValue({
+      ...baseLink,
+      title: 'Updated title',
+    })
+
+    await linksService.update('user-id', 'link-id', {
+      title: 'Updated title',
+    })
+
+    expect(mockedRedirectCacheService.invalidateMany).toHaveBeenCalledWith([
+      'abc123',
+      'abc123',
+    ])
+  })
 })

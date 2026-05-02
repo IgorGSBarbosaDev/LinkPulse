@@ -40,6 +40,37 @@ describe('redirectCacheService', () => {
     expect(mockedGetRedisJson).toHaveBeenCalledWith('link:redirect:abc123')
   })
 
+  it('parses cached expiresAt string into Date', async () => {
+    mockedGetRedisJson.mockResolvedValue({
+      id: 'id-1',
+      originalUrl: 'https://example.com',
+      shortCode: 'abc123',
+      active: true,
+      expiresAt: '2030-01-01T00:00:00.000Z',
+      maxClicks: null,
+      clickCount: 1,
+    })
+
+    const result = await redirectCacheService.get('abc123')
+
+    expect(result?.expiresAt).toBeInstanceOf(Date)
+  })
+
+  it('returns null for malformed cached payload', async () => {
+    mockedGetRedisJson.mockResolvedValue({
+      originalUrl: 'https://example.com',
+      shortCode: 'abc123',
+      active: true,
+      expiresAt: 'not-a-date',
+      maxClicks: null,
+      clickCount: 1,
+    })
+
+    const result = await redirectCacheService.get('abc123')
+
+    expect(result).toBeNull()
+  })
+
   it('uses default ttl when expiresAt absent', async () => {
     await redirectCacheService.set({
       id: 'id-1',
