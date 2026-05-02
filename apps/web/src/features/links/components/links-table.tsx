@@ -30,6 +30,13 @@ export function LinksTable({
       </div>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[760px] border-collapse text-left">
+          <colgroup>
+            <col className="w-[30%]" />
+            <col className="w-[34%]" />
+            <col className="w-[12%]" />
+            <col className="w-[10%]" />
+            <col className="w-[14%]" />
+          </colgroup>
           <thead className="bg-card">
             <tr className="border-b border-border">
               <th className="px-4 py-2.5 text-xs font-medium uppercase tracking-label text-muted-foreground">
@@ -38,13 +45,13 @@ export function LinksTable({
               <th className="px-4 py-2.5 text-xs font-medium uppercase tracking-label text-muted-foreground">
                 Short link
               </th>
-              <th className="px-4 py-2.5 text-xs font-medium uppercase tracking-label text-muted-foreground">
+              <th className="w-[12%] px-4 py-2.5 text-xs font-medium uppercase tracking-label text-muted-foreground">
                 Status
               </th>
-              <th className="px-4 py-2.5 text-xs font-medium uppercase tracking-label text-muted-foreground">
+              <th className="w-[10%] px-4 py-2.5 text-xs font-medium uppercase tracking-label text-muted-foreground">
                 Clicks
               </th>
-              <th className="px-4 py-2.5 text-xs font-medium uppercase tracking-label text-muted-foreground">
+              <th className="w-[14%] px-4 py-2.5 text-right text-xs font-medium uppercase tracking-label text-muted-foreground">
                 Actions
               </th>
             </tr>
@@ -55,7 +62,7 @@ export function LinksTable({
                 className="border-b border-border transition-colors last:border-b-0 hover:bg-surface"
                 key={link.id}
               >
-                <td className="max-w-48 px-4 py-2.5 align-top">
+                <td className="max-w-[340px] px-4 py-2.5 align-top">
                   <div className="flex flex-col gap-1">
                     <span className="truncate text-sm font-medium text-foreground">
                       {getDisplayTitle(link)}
@@ -65,7 +72,7 @@ export function LinksTable({
                     </span>
                   </div>
                 </td>
-                <td className="max-w-56 px-4 py-2.5 align-top">
+                <td className="max-w-[420px] px-4 py-2.5 align-top">
                   <a
                     className="block truncate font-mono text-xs text-foreground hover:text-primary hover:underline"
                     href={link.shortUrl}
@@ -84,8 +91,8 @@ export function LinksTable({
                     {link.clickCount}
                   </span>
                 </td>
-                <td className="px-4 py-2.5 align-top">
-                  <div className="flex items-center gap-1 rounded-md border border-border bg-background px-1 py-0.5">
+                <td className="px-4 py-2.5 align-top text-right">
+                  <div className="ml-auto inline-flex items-center gap-1 rounded-md border border-border bg-background px-1 py-0.5">
                     <Link to={`/links/${link.id}/edit`}>
                       <Button aria-label="Edit link" size="sm" variant="ghost">
                         <Edit3 aria-hidden="true" className="size-4" />
