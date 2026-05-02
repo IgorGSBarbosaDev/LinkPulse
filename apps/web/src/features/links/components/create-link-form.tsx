@@ -70,6 +70,7 @@ export function CreateLinkForm() {
   return (
     <form
       className="rounded-lg border border-border bg-card p-5"
+      noValidate
       onSubmit={handleSubmit(onSubmit)}
     >
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)]">

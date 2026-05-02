@@ -99,8 +99,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     () => ({
       user: meQuery.data ?? null,
       token,
+      hasToken: Boolean(token),
       isAuthenticated: Boolean(token && meQuery.data),
       isLoadingSession: Boolean(token) && meQuery.isLoading,
+      sessionError: meQuery.error ?? null,
       loginAsync: loginMutation.mutateAsync,
       registerAsync: registerMutation.mutateAsync,
       logout,
@@ -113,6 +115,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       token,
       meQuery.data,
       meQuery.isLoading,
+      meQuery.error,
       loginMutation.mutateAsync,
       loginMutation.error,
       loginMutation.isPending,
