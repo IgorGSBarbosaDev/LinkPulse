@@ -33,7 +33,10 @@ export function RegisterForm() {
   async function onSubmit(values: RegisterFormValues) {
     try {
       await registerAsync(values)
-      navigate('/login', { replace: true })
+      navigate('/email-verification-sent', {
+        replace: true,
+        state: { email: values.email },
+      })
     } catch (error) {
       const apiError = error as ApiError
       setError('root', { message: apiError.message })

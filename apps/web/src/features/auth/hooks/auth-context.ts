@@ -3,10 +3,10 @@ import { createContext } from 'react'
 import type { ApiError } from '../../../shared/api/api-error'
 import type {
   AuthUser,
+  EmailVerificationRegisterResponse,
   LoginRequest,
   LoginResponse,
   RegisterRequest,
-  RegisterResponse,
 } from '../types'
 
 export type AuthContextValue = {
@@ -17,7 +17,7 @@ export type AuthContextValue = {
   isLoadingSession: boolean
   sessionError: ApiError | null
   loginAsync: (payload: LoginRequest) => Promise<LoginResponse>
-  registerAsync: (payload: RegisterRequest) => Promise<RegisterResponse>
+  registerAsync: (payload: RegisterRequest) => Promise<EmailVerificationRegisterResponse>
   logout: () => void
   loginError: ApiError | null
   registerError: ApiError | null

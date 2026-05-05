@@ -9,6 +9,11 @@ export type ApiErrorCode =
   | 'VALIDATION_ERROR'
   | 'NETWORK_ERROR'
   | 'UNKNOWN_ERROR'
+  | 'EMAIL_NOT_VERIFIED'
+  | 'INVALID_VERIFICATION_TOKEN'
+  | 'VERIFICATION_TOKEN_EXPIRED'
+  | 'VERIFICATION_TOKEN_ALREADY_USED'
+  | 'VERIFICATION_TOKEN_REVOKED'
 
 type ErrorPayload = {
   code?: string
@@ -44,7 +49,7 @@ export function normalizeApiError(error: unknown): ApiError {
     const status = error.response.status
 
     return {
-      code: statusCodeMap[status] ?? 'UNKNOWN_ERROR',
+      code: (payload?.code as ApiErrorCode | undefined) ?? statusCodeMap[status] ?? 'UNKNOWN_ERROR',
       message:
         payload?.message ??
         payload?.error ??

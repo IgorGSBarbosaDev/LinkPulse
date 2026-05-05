@@ -19,10 +19,10 @@ import {
 import { getMe, login, register } from '../api/auth-api'
 import type {
   AuthUser,
+  EmailVerificationRegisterResponse,
   LoginRequest,
   LoginResponse,
   RegisterRequest,
-  RegisterResponse,
 } from '../types'
 import { AuthContext, type AuthContextValue } from './auth-context'
 
@@ -62,13 +62,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
   })
 
   const registerMutation = useMutation<
-    RegisterResponse,
+    EmailVerificationRegisterResponse,
     ApiError,
     RegisterRequest
   >({
     mutationFn: register,
     onSuccess: () => {
-      toast.success('Account created. Sign in to continue.')
+      toast.success('Account created. Check your email to continue.')
     },
   })
 
