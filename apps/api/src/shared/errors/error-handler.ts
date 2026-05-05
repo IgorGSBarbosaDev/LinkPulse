@@ -8,6 +8,7 @@ type ErrorResponse = {
     statusCode: number
     error: string
     message: string
+    code?: string
     details:{
         field?: string
         message: string
@@ -21,12 +22,18 @@ export function errorHandler(
     _next: NextFunction,
 ): Response<ErrorResponse> {
     if (error instanceof AppError) {
-        return res.status(error.statusCode).json({
+        const response: ErrorResponse = {
             statusCode: error.statusCode,
             error: error.error,
             message: error.message,
             details: error.details,
-        })
+        }
+
+        if (error.code) {
+            response.code = error.code
+        }
+
+        return res.status(error.statusCode).json(response)
     }
     if (error instanceof ZodError) {
         return res.status(400).json({

@@ -65,9 +65,22 @@ const swaggerDefinition = {
           id: { type: 'string', format: 'uuid' },
           name: { type: 'string', example: 'Igor Silva' },
           email: { type: 'string', format: 'email', example: 'igor@email.com' },
+          emailVerifiedAt: { type: 'string', format: 'date-time', nullable: true },
           createdAt: { type: 'string', format: 'date-time' },
         },
-        required: ['id', 'name', 'email', 'createdAt'],
+        required: ['id', 'name', 'email', 'emailVerifiedAt', 'createdAt'],
+      },
+      AuthRegisterResponse: {
+        type: 'object',
+        properties: {
+          message: {
+            type: 'string',
+            example: 'Account created. Please verify your email before logging in.',
+          },
+          emailVerificationRequired: { type: 'boolean', example: true },
+          user: { $ref: '#/components/schemas/RegisteredUser' },
+        },
+        required: ['message', 'emailVerificationRequired', 'user'],
       },
       AuthRegisterRequest: {
         type: 'object',
@@ -95,6 +108,27 @@ const swaggerDefinition = {
           user: { $ref: '#/components/schemas/User' },
         },
         required: ['accessToken', 'tokenType', 'expiresIn', 'user'],
+      },
+      VerifyEmailRequest: {
+        type: 'object',
+        properties: {
+          token: { type: 'string', example: 'plain-token-from-email' },
+        },
+        required: ['token'],
+      },
+      ResendVerificationEmailRequest: {
+        type: 'object',
+        properties: {
+          email: { type: 'string', format: 'email', example: 'igor@email.com' },
+        },
+        required: ['email'],
+      },
+      MessageResponse: {
+        type: 'object',
+        properties: {
+          message: { type: 'string' },
+        },
+        required: ['message'],
       },
       Link: {
         type: 'object',
@@ -299,7 +333,7 @@ const swaggerDefinition = {
             description: 'Created',
             content: {
               'application/json': {
-                schema: { $ref: '#/components/schemas/RegisteredUser' },
+                schema: { $ref: '#/components/schemas/AuthRegisterResponse' },
               },
             },
           },
@@ -345,6 +379,111 @@ const swaggerDefinition = {
           },
           400: { $ref: '#/components/responses/ValidationError' },
           401: { $ref: '#/components/responses/UnauthorizedError' },
+          403: {
+            description: 'Email not verified',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ApiError' },
+                example: {
+                  statusCode: 403,
+                  error: 'Forbidden',
+                  message: 'Please verify your email before logging in.',
+                  code: 'EMAIL_NOT_VERIFIED',
+                  details: [],
+                },
+              },
+            },
+          },
+          429: { $ref: '#/components/responses/RateLimitError' },
+        },
+      },
+    },
+    '/api/v1/auth/verify-email': {
+      post: {
+        tags: ['Auth'],
+        summary: 'Verify user email',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/VerifyEmailRequest' },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: 'Success',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/MessageResponse' },
+                example: {
+                  message: 'Email verified successfully. You can now log in.',
+                },
+              },
+            },
+          },
+          400: { $ref: '#/components/responses/ValidationError' },
+          409: {
+            description: 'Token already used',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ApiError' },
+                example: {
+                  statusCode: 409,
+                  error: 'Conflict',
+                  message: 'Verification token has already been used.',
+                  code: 'VERIFICATION_TOKEN_ALREADY_USED',
+                  details: [],
+                },
+              },
+            },
+          },
+          410: {
+            description: 'Token expired or revoked',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ApiError' },
+                example: {
+                  statusCode: 410,
+                  error: 'Gone',
+                  message: 'Verification token has expired.',
+                  code: 'VERIFICATION_TOKEN_EXPIRED',
+                  details: [],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    '/api/v1/auth/resend-verification-email': {
+      post: {
+        tags: ['Auth'],
+        summary: 'Resend verification email',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ResendVerificationEmailRequest',
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: 'Success',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/MessageResponse' },
+                example: {
+                  message:
+                    'If this email is registered and not verified, a new verification link will be sent.',
+                },
+              },
+            },
+          },
+          400: { $ref: '#/components/responses/ValidationError' },
           429: { $ref: '#/components/responses/RateLimitError' },
         },
       },

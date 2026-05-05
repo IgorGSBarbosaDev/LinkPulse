@@ -1,7 +1,12 @@
 import type { NextFunction, Request, Response } from 'express'
 import { AuthService } from './auth.service.js'
 import { AppError } from '../../shared/errors/app-error.js'
-import type { LoginInput, RegisterInput } from './auth.types.js'
+import type {
+    LoginInput,
+    RegisterInput,
+    ResendVerificationEmailInput,
+    VerifyEmailInput,
+} from './auth.types.js'
 
 type AuthenticatedRequest = Request & {
     user?: {
@@ -18,8 +23,8 @@ export class AuthController {
     ): Promise<void> => {
         try {
             const input = req.body as RegisterInput
-            const user = await AuthService.register(input)
-            res.status(201).json(user)
+            const response = await AuthService.register(input)
+            res.status(201).json(response)
         } catch (error) {
             next(error)
         }
@@ -51,6 +56,34 @@ export class AuthController {
             }
             const user = await AuthService.getCurrentUser(userId)
             res.status(200).json(user)
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    static verifyEmail = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> => {
+        try {
+            const input = req.body as VerifyEmailInput
+            const response = await AuthService.verifyEmail(input)
+            res.status(200).json(response)
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    static resendVerificationEmail = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> => {
+        try {
+            const input = req.body as ResendVerificationEmailInput
+            const response = await AuthService.resendVerificationEmail(input)
+            res.status(200).json(response)
         } catch (error) {
             next(error)
         }

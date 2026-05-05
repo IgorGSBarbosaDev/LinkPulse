@@ -4,13 +4,20 @@ import type { SignOptions } from 'jsonwebtoken'
 import { prisma } from '../../shared/config/prisma.js'
 import { env } from '../../shared/config/env.js'
 import { AppError } from '../../shared/errors/app-error.js'
+import { EmailVerificationService } from '../email-verification/email-verification.service.js'
+import { emailService } from '../email/email.service.js'
+import { normalizeEmail } from '../../shared/utils/normalize-email.js'
 import type {
   AuthResponse,
   AuthUser,
   JwtPayload,
   LoginInput,
+  MessageResponse,
+  ResendVerificationEmailInput,
   RegisteredUser,
+  RegisterResponse,
   RegisterInput,
+  VerifyEmailInput,
 } from './auth.types.js'
 
 const PASSWORD_SALT_ROUNDS = 10
@@ -49,10 +56,11 @@ const ACCESS_TOKEN_EXPIRES_IN_SECONDS =
   expiresInToSeconds(env.JWT_EXPIRES_IN) || DEFAULT_ACCESS_TOKEN_EXPIRES_IN_SECONDS
 
 export class AuthService {
-  static async register(input: RegisterInput): Promise<RegisteredUser> {
+  static async register(input: RegisterInput): Promise<RegisterResponse> {
+    const email = normalizeEmail(input.email)
     const existingUser = await prisma.user.findUnique({
       where: {
-        email: input.email,
+        email,
       },
     })
 
@@ -72,24 +80,47 @@ export class AuthService {
     const user = await prisma.user.create({
       data: {
         name: input.name,
-        email: input.email,
+        email,
         passwordHash,
+        emailVerifiedAt: null,
       },
       select: {
         id: true,
         name: true,
         email: true,
+        emailVerifiedAt: true,
         createdAt: true,
       },
     })
 
-    return user
+    const verificationToken = await EmailVerificationService.createToken(user.id)
+    const verificationUrl = this.buildVerificationUrl(verificationToken.token)
+
+    try {
+      await emailService.sendVerificationEmail({
+        to: user.email,
+        name: user.name,
+        verificationUrl,
+        expirationMinutes: env.EMAIL_VERIFICATION_TOKEN_EXPIRES_IN_MINUTES,
+      })
+    } catch {
+      throw AppError.internal(
+        'Account created, but verification email could not be sent. Please try resending the verification email.',
+      )
+    }
+
+    return {
+      message: 'Account created. Please verify your email before logging in.',
+      emailVerificationRequired: true,
+      user,
+    }
   }
 
   static async login(input: LoginInput): Promise<AuthResponse> {
+    const email = normalizeEmail(input.email)
     const user = await prisma.user.findUnique({
       where: {
-        email: input.email,
+        email,
       },
     })
 
@@ -114,6 +145,14 @@ export class AuthService {
       })
     }
 
+    if (!user.emailVerifiedAt) {
+      throw AppError.forbidden(
+        'Please verify your email before logging in.',
+        undefined,
+        'EMAIL_NOT_VERIFIED',
+      )
+    }
+
     const authUser: AuthUser = {
       id: user.id,
       name: user.name,
@@ -131,6 +170,54 @@ export class AuthService {
       expiresIn: ACCESS_TOKEN_EXPIRES_IN_SECONDS,
       user: authUser,
     }
+  }
+
+  static async verifyEmail(
+    input: VerifyEmailInput,
+  ): Promise<MessageResponse> {
+    return EmailVerificationService.verifyToken(input.token)
+  }
+
+  static async resendVerificationEmail(
+    input: ResendVerificationEmailInput,
+  ): Promise<MessageResponse> {
+    const genericResponse = {
+      message:
+        'If this email is registered and not verified, a new verification link will be sent.',
+    }
+    const email = normalizeEmail(input.email)
+    const user = await prisma.user.findUnique({
+      where: {
+        email,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        emailVerifiedAt: true,
+      },
+    })
+
+    if (!user || user.emailVerifiedAt) {
+      return genericResponse
+    }
+
+    const verificationToken = await EmailVerificationService.resendToken(user.id)
+
+    try {
+      await emailService.sendVerificationEmail({
+        to: user.email,
+        name: user.name,
+        verificationUrl: this.buildVerificationUrl(verificationToken.token),
+        expirationMinutes: env.EMAIL_VERIFICATION_TOKEN_EXPIRES_IN_MINUTES,
+      })
+    } catch {
+      throw AppError.internal(
+        'Verification email could not be sent. Please try again later.',
+      )
+    }
+
+    return genericResponse
   }
 
   static async getCurrentUser(userId: string): Promise<AuthUser> {
@@ -170,5 +257,12 @@ export class AuthService {
     return jwt.sign(payload, secret, {
       expiresIn: JWT_EXPIRES_IN_FOR_SIGN,
     })
+  }
+
+  private static buildVerificationUrl(token: string): string {
+    const url = new URL(env.EMAIL_VERIFICATION_URL)
+    url.searchParams.set('token', token)
+
+    return url.toString()
   }
 }

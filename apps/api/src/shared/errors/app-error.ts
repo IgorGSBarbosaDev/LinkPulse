@@ -9,12 +9,14 @@ export type AppErrorParams = {
   statusCode: number
   error: ErrorCode
   message: string
+  code?: string
   details?: ErrorDetail[]
 }
 
 export class AppError extends Error {
   public readonly statusCode: number
   public readonly error: ErrorCode
+  public readonly code?: string
   public readonly details: ErrorDetail[]
 
   constructor(params: AppErrorParams) {
@@ -25,6 +27,10 @@ export class AppError extends Error {
     this.error = params.error
     this.details = params.details ?? []
 
+    if (params.code !== undefined) {
+      this.code = params.code
+    }
+
     Error.captureStackTrace?.(this, this.constructor)
   }
 
@@ -33,11 +39,16 @@ export class AppError extends Error {
     error: ErrorCode,
     message: string,
     details?: ErrorDetail[],
+    code?: string,
   ): AppError {
     const params: AppErrorParams = {
       statusCode,
       error,
       message,
+    }
+
+    if (code !== undefined) {
+      params.code = code
     }
 
     if (details !== undefined) {
@@ -50,12 +61,14 @@ export class AppError extends Error {
   static badRequest(
     message = 'Invalid request data.',
     details?: ErrorDetail[],
+    code?: string,
   ): AppError {
     return AppError.create(
       400,
       ErrorCode.BAD_REQUEST,
       message,
       details,
+      code,
     )
   }
 
@@ -78,12 +91,14 @@ export class AppError extends Error {
   static forbidden(
     message = 'You do not have permission to access this resource.',
     details?: ErrorDetail[],
+    code?: string,
   ): AppError {
     return AppError.create(
       403,
       ErrorCode.FORBIDDEN,
       message,
       details,
+      code,
     )
   }
 
@@ -102,24 +117,28 @@ export class AppError extends Error {
   static conflict(
     message = 'Resource conflict.',
     details?: ErrorDetail[],
+    code?: string,
   ): AppError {
     return AppError.create(
       409,
       ErrorCode.CONFLICT,
       message,
       details,
+      code,
     )
   }
 
   static gone(
     message = 'Resource is no longer available.',
     details?: ErrorDetail[],
+    code?: string,
   ): AppError {
     return AppError.create(
       410,
       ErrorCode.GONE,
       message,
       details,
+      code,
     )
   }
 

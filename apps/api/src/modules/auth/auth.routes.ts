@@ -1,15 +1,29 @@
 import { Router } from 'express'
 import { AuthController } from './auth.controller.js'
-import { loginSchema, registerSchema } from './auth.schemas.js'
+import {
+    loginSchema,
+    registerSchema,
+    resendVerificationEmailSchema,
+    verifyEmailSchema,
+} from './auth.schemas.js'
 import { validateRequest } from '../../shared/middlewares/validate-request.middleware.js'
 import { authMiddleware } from '../../shared/middlewares/auth.middleware.js'
 import { env } from '../../shared/config/env.js'
-import { byIpRateLimit } from '../../shared/middlewares/rate-limit.middleware.js'
+import {
+    byIpRateLimit,
+    createRateLimitMiddleware,
+} from '../../shared/middlewares/rate-limit.middleware.js'
+import { normalizeEmail } from '../../shared/utils/normalize-email.js'
 
 export const authRoutes = Router()
 
 authRoutes.post(
     '/register',
+    byIpRateLimit({
+        keyPrefix: 'rate:register',
+        max: env.RATE_LIMIT_REGISTER_MAX,
+        windowInSeconds: env.RATE_LIMIT_REGISTER_WINDOW_SECONDS,
+    }),
     validateRequest(registerSchema),
     AuthController.register
 )
@@ -29,4 +43,33 @@ authRoutes.get(
     '/me',
     authMiddleware,
     AuthController.me
+)
+
+authRoutes.post(
+    '/verify-email',
+    validateRequest(verifyEmailSchema),
+    AuthController.verifyEmail
+)
+
+authRoutes.post(
+    '/resend-verification-email',
+    byIpRateLimit({
+        keyPrefix: 'rate:email-verification:resend:ip',
+        max: env.RATE_LIMIT_EMAIL_VERIFICATION_RESEND_MAX,
+        windowInSeconds:
+            env.RATE_LIMIT_EMAIL_VERIFICATION_RESEND_WINDOW_SECONDS,
+    }),
+    validateRequest(resendVerificationEmailSchema),
+    createRateLimitMiddleware({
+        keyPrefix: 'rate:email-verification:resend:email',
+        max: env.RATE_LIMIT_EMAIL_VERIFICATION_RESEND_MAX,
+        windowInSeconds:
+            env.RATE_LIMIT_EMAIL_VERIFICATION_RESEND_WINDOW_SECONDS,
+        getIdentifier: (req) => {
+            const email = (req.body as { email?: string }).email
+
+            return email ? normalizeEmail(email) : null
+        },
+    }),
+    AuthController.resendVerificationEmail
 )
