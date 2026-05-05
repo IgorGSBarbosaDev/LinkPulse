@@ -37,6 +37,7 @@ O projeto deve demonstrar:
 
 - Cadastro de usuário.
 - Login.
+- Validação de cadastro por e-mail.
 - Geração de token JWT.
 - Hash de senha com bcrypt.
 - Rota para obter o usuário autenticado.
@@ -108,7 +109,6 @@ PostgreSQL continuará sendo a fonte de verdade.
 - refresh token;
 - login social;
 - recuperação de senha;
-- verificação de e-mail;
 - autenticação de dois fatores;
 - planos pagos;
 - times/organizações;
@@ -392,10 +392,23 @@ DATABASE_URL=postgresql://linkpulse:linkpulse@localhost:55432/linkpulse
 REDIS_URL=redis://localhost:6379
 JWT_SECRET=change-this-secret
 JWT_EXPIRES_IN=1h
+EMAIL_PROVIDER=console
+EMAIL_FROM="LinkPulse <no-reply@linkpulse.app>"
+EMAIL_VERIFICATION_TOKEN_EXPIRES_IN_MINUTES=60
+EMAIL_VERIFICATION_URL=http://localhost:5173/verify-email
+SMTP_HOST=
+SMTP_PORT=587
+SMTP_USER=
+SMTP_PASS=
+SMTP_SECURE=false
 APP_BASE_URL=http://localhost:3000
 FRONTEND_URL=http://localhost:5173
 RATE_LIMIT_REDIRECT_MAX=100
 RATE_LIMIT_REDIRECT_WINDOW_SECONDS=60
+RATE_LIMIT_REGISTER_MAX=5
+RATE_LIMIT_REGISTER_WINDOW_SECONDS=3600
+RATE_LIMIT_EMAIL_VERIFICATION_RESEND_MAX=3
+RATE_LIMIT_EMAIL_VERIFICATION_RESEND_WINDOW_SECONDS=3600
 RATE_LIMIT_CREATE_LINK_MAX=20
 RATE_LIMIT_CREATE_LINK_WINDOW_SECONDS=3600
 ```
@@ -416,6 +429,8 @@ VITE_APP_NAME=LinkPulse
 ```http
 POST /api/v1/auth/register
 POST /api/v1/auth/login
+POST /api/v1/auth/verify-email
+POST /api/v1/auth/resend-verification-email
 GET  /api/v1/auth/me
 ```
 
