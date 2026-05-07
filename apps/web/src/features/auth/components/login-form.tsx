@@ -1,9 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 
 import type { ApiError } from '../../../shared/api/api-error'
+import { toApiErrorCopy } from '../../../shared/api/api-error-copy'
 import { Button } from '../../../shared/components/ui/button'
 import { cn } from '../../../shared/lib/utils'
 import { useEmailVerification } from '../hooks/use-email-verification'
@@ -27,6 +29,7 @@ export function LoginForm() {
   const location = useLocation()
   const state = location.state as LocationState | null
   const returnPath = state?.from?.pathname ?? '/dashboard'
+  const [rootErrorCode, setRootErrorCode] = useState<ApiError['code'] | null>(null)
 
   const {
     formState: { errors },
@@ -42,21 +45,20 @@ export function LoginForm() {
     },
   })
   const currentEmail = useWatch({ control, name: 'email' })
-  const rootError = errors.root?.message
-  const isEmailNotVerified =
-    rootError ===
-    'Sua conta ainda não foi verificada. Acesse o link enviado para seu e-mail ou solicite um novo envio.'
+  const isEmailNotVerified = rootErrorCode === 'EMAIL_NOT_VERIFIED'
 
   async function onSubmit(values: LoginFormValues) {
     try {
+      setRootErrorCode(null)
       await loginAsync(values)
       navigate(returnPath, { replace: true })
     } catch (error) {
       const apiError = error as ApiError
       const message =
         apiError.code === 'EMAIL_NOT_VERIFIED'
-          ? 'Sua conta ainda não foi verificada. Acesse o link enviado para seu e-mail ou solicite um novo envio.'
+          ? toApiErrorCopy(apiError, 'Email verification required').description
           : apiError.message
+      setRootErrorCode(apiError.code)
       setError('root', { message })
       toast.error(apiError.message)
     }

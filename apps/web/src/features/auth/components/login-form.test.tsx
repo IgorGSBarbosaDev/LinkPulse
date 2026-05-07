@@ -60,7 +60,7 @@ describe('LoginForm', () => {
     await user.click(screen.getByRole('button', { name: /sign in/i }))
 
     expect(
-      await screen.findByText(/sua conta ainda não foi verificada/i),
+      await screen.findByText(/your account has not been verified yet/i),
     ).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: /resend verification email/i }))

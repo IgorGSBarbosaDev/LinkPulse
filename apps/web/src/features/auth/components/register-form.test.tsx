@@ -83,4 +83,30 @@ describe('RegisterForm', () => {
       state: { email: 'igor@email.com' },
     })
   })
+
+  it('shows controlled guidance when account is created but email sending fails', async () => {
+    const user = userEvent.setup()
+    registerAsync.mockRejectedValue({
+      code: 'UNKNOWN_ERROR',
+      message:
+        'Account created, but verification email could not be sent. Please try resending the verification email.',
+      status: 500,
+    })
+
+    render(
+      <MemoryRouter>
+        <RegisterForm />
+      </MemoryRouter>,
+    )
+
+    await user.type(screen.getByLabelText(/name/i), 'Igor')
+    await user.type(screen.getByLabelText(/email/i), 'igor@email.com')
+    await user.type(screen.getByLabelText(/password/i), '12345')
+    await user.click(screen.getByRole('button', { name: /create account/i }))
+
+    expect(
+      await screen.findByText(/your account was created, but linkpulse could not send the verification email/i),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /go to login/i })).toBeInTheDocument()
+  })
 })

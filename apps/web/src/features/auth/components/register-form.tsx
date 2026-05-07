@@ -39,7 +39,14 @@ export function RegisterForm() {
       })
     } catch (error) {
       const apiError = error as ApiError
-      setError('root', { message: apiError.message })
+      const accountCreatedButEmailFailed =
+        apiError.message.includes('Account created, but verification email could not be sent')
+
+      setError('root', {
+        message: accountCreatedButEmailFailed
+          ? 'Your account was created, but LinkPulse could not send the verification email. Go to login and request a new verification email.'
+          : apiError.message,
+      })
       toast.error(apiError.message)
     }
   }
@@ -95,8 +102,13 @@ export function RegisterForm() {
       </div>
 
       {errors.root ? (
-        <div className="rounded-md border border-border bg-background p-3 text-sm text-error">
-          {errors.root.message}
+        <div className="flex flex-col gap-3 rounded-md border border-border bg-background p-3 text-sm text-error">
+          <p>{errors.root.message}</p>
+          {errors.root.message?.includes('could not send the verification email') ? (
+            <Link className="text-foreground hover:underline" to="/login">
+              Go to login
+            </Link>
+          ) : null}
         </div>
       ) : null}
 
