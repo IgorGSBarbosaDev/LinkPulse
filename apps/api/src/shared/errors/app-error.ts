@@ -145,12 +145,14 @@ export class AppError extends Error {
   static tooManyRequests(
     message = 'Too many requests. Please try again later.',
     details?: ErrorDetail[],
+    code?: string,
   ): AppError {
     return AppError.create(
       429,
       ErrorCode.TOO_MANY_REQUESTS,
       message,
       details,
+      code,
     )
   }
 

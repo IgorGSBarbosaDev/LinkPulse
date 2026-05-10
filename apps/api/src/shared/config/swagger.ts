@@ -209,8 +209,17 @@ const swaggerDefinition = {
             items: { $ref: '#/components/schemas/Link' },
           },
           pagination: { $ref: '#/components/schemas/Pagination' },
+          quota: {
+            type: 'object',
+            properties: {
+              limit: { type: 'integer', example: 15 },
+              used: { type: 'integer', example: 9 },
+              remaining: { type: 'integer', example: 6 },
+            },
+            required: ['limit', 'used', 'remaining'],
+          },
         },
-        required: ['data', 'pagination'],
+        required: ['data', 'pagination', 'quota'],
       },
       AnalyticsSummary: {
         type: 'object',
@@ -307,6 +316,7 @@ const swaggerDefinition = {
               statusCode: 429,
               error: 'Too Many Requests',
               message: 'Too many requests. Please try again later.',
+              code: 'RATE_LIMITED',
               details: [],
             },
           },
@@ -538,6 +548,21 @@ const swaggerDefinition = {
           },
           400: { $ref: '#/components/responses/ValidationError' },
           401: { $ref: '#/components/responses/UnauthorizedError' },
+          403: {
+            description: 'User reached links quota',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ApiError' },
+                example: {
+                  statusCode: 403,
+                  error: 'Forbidden',
+                  message: 'You have reached the maximum limit of 15 links.',
+                  code: 'LINK_LIMIT_REACHED',
+                  details: [],
+                },
+              },
+            },
+          },
           409: {
             description: 'Conflict',
             content: {
@@ -547,6 +572,7 @@ const swaggerDefinition = {
                   statusCode: 409,
                   error: 'Conflict',
                   message: 'This alias is already in use.',
+                  code: 'CONFLICT',
                   details: [],
                 },
               },

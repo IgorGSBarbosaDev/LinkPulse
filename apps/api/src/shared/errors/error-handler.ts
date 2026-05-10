@@ -3,6 +3,10 @@ import { ZodError } from 'zod'
 import { Prisma } from '@prisma/client'
 import { AppError } from './app-error.js'
 import { ErrorCode } from './error-codes.js'
+import {
+    sendRedirectErrorPage,
+    shouldRenderRedirectErrorPage,
+} from '../../modules/redirects/redirect-error-page.js'
 
 type ErrorResponse = {
     statusCode: number
@@ -17,11 +21,15 @@ type ErrorResponse = {
 
 export function errorHandler(
     error: unknown,
-    _req: Request,
+    req: Request,
     res: Response,
     _next: NextFunction,
-): Response<ErrorResponse> {
+): Response {
     if (error instanceof AppError) {
+        if (shouldRenderRedirectErrorPage(req)) {
+            return sendRedirectErrorPage(req, res, error.statusCode)
+        }
+
         const response: ErrorResponse = {
             statusCode: error.statusCode,
             error: error.error,
@@ -36,6 +44,10 @@ export function errorHandler(
         return res.status(error.statusCode).json(response)
     }
     if (error instanceof ZodError) {
+        if (shouldRenderRedirectErrorPage(req)) {
+            return sendRedirectErrorPage(req, res, 400)
+        }
+
         return res.status(400).json({
             statusCode: 400,
             error: 'Bad Request',
@@ -48,15 +60,24 @@ export function errorHandler(
     }
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
     if (error.code === 'P2002') {
+      if (shouldRenderRedirectErrorPage(req)) {
+        return sendRedirectErrorPage(req, res, 409)
+      }
+
       return res.status(409).json({
         statusCode: 409,
         error: ErrorCode.CONFLICT,
         message: 'Unique constraint violation',
+        code: 'CONFLICT',
         details: [],
       })
     }
 
     if (error.code === 'P2025') {
+        if (shouldRenderRedirectErrorPage(req)) {
+            return sendRedirectErrorPage(req, res, 404)
+        }
+
         return res.status(404).json({
             statusCode: 404,
             error: ErrorCode.NOT_FOUND,
@@ -67,6 +88,10 @@ export function errorHandler(
 }
     if (process.env.NODE_ENV !== 'production') {
         console.error(error)
+    }
+
+    if (shouldRenderRedirectErrorPage(req)) {
+        return sendRedirectErrorPage(req, res, 500)
     }
 
     return res.status(500).json({

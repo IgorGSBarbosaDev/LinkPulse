@@ -38,7 +38,11 @@ export function createRateLimitMiddleware(options: RateLimitOptions) {
       )
 
       if (!result.allowed) {
-        throw AppError.tooManyRequests()
+        throw AppError.tooManyRequests(
+          'Too many requests. Please try again later.',
+          undefined,
+          'RATE_LIMITED',
+        )
       }
 
       return next()
