@@ -5,11 +5,13 @@ export type ApiErrorCode =
   | 'FORBIDDEN'
   | 'NOT_FOUND'
   | 'CONFLICT'
+  | 'GONE'
   | 'RATE_LIMITED'
   | 'VALIDATION_ERROR'
   | 'NETWORK_ERROR'
   | 'UNKNOWN_ERROR'
   | 'EMAIL_NOT_VERIFIED'
+  | 'LINK_LIMIT_REACHED'
   | 'INVALID_VERIFICATION_TOKEN'
   | 'VERIFICATION_TOKEN_EXPIRED'
   | 'VERIFICATION_TOKEN_ALREADY_USED'
@@ -33,6 +35,7 @@ const statusCodeMap: Record<number, ApiErrorCode> = {
   403: 'FORBIDDEN',
   404: 'NOT_FOUND',
   409: 'CONFLICT',
+  410: 'GONE',
   429: 'RATE_LIMITED',
 }
 

@@ -23,7 +23,7 @@ export function LandingPage() {
           </p>
           <div className="flex w-full max-w-sm flex-col items-center gap-2">
             <Link
-              className="inline-flex w-full items-center justify-center rounded-md border border-transparent bg-primary px-6 py-3 text-xs font-medium uppercase tracking-label text-black transition-all duration-200 hover:bg-muted hover:text-primary"
+              className="inline-flex w-full items-center justify-center rounded-md border border-transparent bg-primary px-6 py-3 text-xs font-medium uppercase tracking-label text-primary-foreground transition-colors duration-200 hover:bg-primary/90"
               to="/register"
             >
               Criar conta

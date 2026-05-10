@@ -12,6 +12,11 @@ export function useCreateLink() {
   return useMutation({
     mutationFn: createLink,
     onError: (error: ApiError) => {
+      if (error.code === 'LINK_LIMIT_REACHED') {
+        toast.error('You have reached the maximum limit of 15 links.')
+        return
+      }
+
       toast.error(error.message || 'Link could not be created. Try again.')
     },
     onSuccess: async () => {
