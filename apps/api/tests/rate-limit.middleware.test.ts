@@ -62,6 +62,7 @@ describe('rate-limit middleware', () => {
     expect(next).toHaveBeenCalledTimes(1)
     expect(next.mock.calls[0]?.[0]).toBeInstanceOf(AppError)
     expect((next.mock.calls[0]?.[0] as AppError).statusCode).toBe(429)
+    expect((next.mock.calls[0]?.[0] as AppError).code).toBe('RATE_LIMITED')
   })
 
   it('fails open on redis/service errors', async () => {

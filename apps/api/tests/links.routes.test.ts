@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken'
 import request from 'supertest'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { rateLimitService } from '../src/modules/rate-limit/rate-limit.service.js'
+import { AppError } from '../src/shared/errors/app-error.js'
 
 const createMock = vi.fn()
 const listMock = vi.fn()
@@ -77,7 +78,71 @@ describe('POST /api/v1/links', () => {
     expect(response.body).toMatchObject({
       statusCode: 429,
       error: 'Too Many Requests',
+      code: 'RATE_LIMITED',
     })
     expect(createMock).not.toHaveBeenCalled()
+  })
+
+  it('returns 403 with LINK_LIMIT_REACHED when user reached quota', async () => {
+    const { app } = await import('../src/app.js')
+    const token = buildToken()
+
+    createMock.mockImplementation((_req, _res, next) => {
+      next(
+        AppError.forbidden(
+          'You have reached the maximum limit of 15 links.',
+          undefined,
+          'LINK_LIMIT_REACHED',
+        ),
+      )
+    })
+
+    const response = await request(app)
+      .post('/api/v1/links')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        originalUrl: 'https://example.com',
+      })
+
+    expect(response.status).toBe(403)
+    expect(response.body).toEqual({
+      statusCode: 403,
+      error: 'Forbidden',
+      message: 'You have reached the maximum limit of 15 links.',
+      code: 'LINK_LIMIT_REACHED',
+      details: [],
+    })
+  })
+
+  it('returns 409 with CONFLICT when alias is already in use', async () => {
+    const { app } = await import('../src/app.js')
+    const token = buildToken()
+
+    createMock.mockImplementation((_req, _res, next) => {
+      next(
+        AppError.conflict(
+          'This alias is already in use.',
+          undefined,
+          'CONFLICT',
+        ),
+      )
+    })
+
+    const response = await request(app)
+      .post('/api/v1/links')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        originalUrl: 'https://example.com',
+        customAlias: 'taken-alias',
+      })
+
+    expect(response.status).toBe(409)
+    expect(response.body).toEqual({
+      statusCode: 409,
+      error: 'Conflict',
+      message: 'This alias is already in use.',
+      code: 'CONFLICT',
+      details: [],
+    })
   })
 })
