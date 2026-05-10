@@ -16,6 +16,11 @@ const envSchema = z.object({
     .string()
     .min(1, 'DATABASE_URL is required'),
 
+  DATABASE_URL_TEST: z
+    .string()
+    .min(1)
+    .optional(),
+
   REDIS_URL: z
     .string()
     .min(1, 'REDIS_URL is required')

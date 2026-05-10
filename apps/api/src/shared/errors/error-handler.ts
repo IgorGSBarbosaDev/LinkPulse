@@ -19,6 +19,27 @@ type ErrorResponse = {
      }[]
 }
 
+function getUniqueConstraintMessage(
+    error: Prisma.PrismaClientKnownRequestError,
+): string {
+    const target = error.meta?.target
+    const fields = Array.isArray(target)
+        ? target.map((item) => String(item))
+        : typeof target === 'string'
+            ? [target]
+            : []
+
+    if (fields.some((field) => field.includes('customAlias'))) {
+        return 'This alias is already in use.'
+    }
+
+    if (fields.some((field) => field.includes('shortCode'))) {
+        return 'This short code is already in use.'
+    }
+
+    return 'Unique constraint violation'
+}
+
 export function errorHandler(
     error: unknown,
     req: Request,
@@ -67,7 +88,7 @@ export function errorHandler(
       return res.status(409).json({
         statusCode: 409,
         error: ErrorCode.CONFLICT,
-        message: 'Unique constraint violation',
+        message: getUniqueConstraintMessage(error),
         code: 'CONFLICT',
         details: [],
       })

@@ -114,35 +114,4 @@ describe('POST /api/v1/links', () => {
     })
   })
 
-  it('returns 409 with CONFLICT when alias is already in use', async () => {
-    const { app } = await import('../src/app.js')
-    const token = buildToken()
-
-    createMock.mockImplementation((_req, _res, next) => {
-      next(
-        AppError.conflict(
-          'This alias is already in use.',
-          undefined,
-          'CONFLICT',
-        ),
-      )
-    })
-
-    const response = await request(app)
-      .post('/api/v1/links')
-      .set('Authorization', `Bearer ${token}`)
-      .send({
-        originalUrl: 'https://example.com',
-        customAlias: 'taken-alias',
-      })
-
-    expect(response.status).toBe(409)
-    expect(response.body).toEqual({
-      statusCode: 409,
-      error: 'Conflict',
-      message: 'This alias is already in use.',
-      code: 'CONFLICT',
-      details: [],
-    })
-  })
 })

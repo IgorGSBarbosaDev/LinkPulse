@@ -32,6 +32,9 @@ Endpoint público de redirecionamento:
 /r/:shortCode
 ```
 
+Para testes automatizados da API que dependem de PostgreSQL real (quota e concorrência), configure `DATABASE_URL_TEST`.
+Se `DATABASE_URL_TEST` não estiver definido, os testes usam `DATABASE_URL`.
+
 ---
 
 ## 2. Autenticação

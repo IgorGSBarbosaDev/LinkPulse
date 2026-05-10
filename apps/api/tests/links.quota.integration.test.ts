@@ -14,7 +14,16 @@ async function canConnectToDatabase() {
 }
 
 const hasReachableDatabase = await canConnectToDatabase()
-const describeIfDatabase = hasReachableDatabase ? describe : describe.skip
+
+if (!hasReachableDatabase) {
+  throw new Error(
+    [
+      'Critical quota integration tests require a reachable PostgreSQL test database.',
+      'Start Postgres and set DATABASE_URL or DATABASE_URL_TEST for the API test environment.',
+      'These tests cannot be skipped because they verify quota concurrency and soft-delete semantics.',
+    ].join(' '),
+  )
+}
 
 async function seedLinks(
   userId: string,
@@ -35,7 +44,7 @@ async function seedLinks(
   }
 }
 
-describeIfDatabase('links quota integration', () => {
+describe('links quota integration', () => {
   beforeEach(async () => {
     await resetDatabase()
   })

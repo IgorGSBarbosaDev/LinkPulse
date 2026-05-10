@@ -2,8 +2,13 @@ import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from '@prisma/client'
 import { env } from './env.js'
 
+const databaseUrl =
+  env.NODE_ENV === 'test' && env.DATABASE_URL_TEST
+    ? env.DATABASE_URL_TEST
+    : env.DATABASE_URL
+
 const adapter = new PrismaPg({
-  connectionString: env.DATABASE_URL,
+  connectionString: databaseUrl,
 })
 
 export const prisma = new PrismaClient({
