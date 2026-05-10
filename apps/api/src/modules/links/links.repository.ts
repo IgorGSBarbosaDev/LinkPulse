@@ -2,6 +2,8 @@ import { Prisma, ShortLink } from '@prisma/client'
 import { prisma } from '../../shared/config/prisma.js'
 import { ListLinksQuery } from './links.types.js'
 
+type LinksDbClient = Prisma.TransactionClient | typeof prisma
+
 type CreateShortLinkData = {
   userId: string
   originalUrl: string
@@ -31,8 +33,8 @@ type ListByUserResult = {
 }
 
 class LinksRepository {
-  async create(data: CreateShortLinkData) {
-    return prisma.shortLink.create({
+  async create(data: CreateShortLinkData, db: LinksDbClient = prisma) {
+    return db.shortLink.create({
       data: {
         userId: data.userId,
         originalUrl: data.originalUrl,
@@ -57,16 +59,19 @@ class LinksRepository {
     })
   }
 
-  async findByShortCode(shortCode: string) {
-    return prisma.shortLink.findUnique({
+  async findByShortCode(shortCode: string, db: LinksDbClient = prisma) {
+    return db.shortLink.findUnique({
       where: {
         shortCode,
       },
     })
   }
 
-  async findByCustomAlias(customAlias: string) {
-    return prisma.shortLink.findUnique({
+  async findByCustomAlias(
+    customAlias: string,
+    db: LinksDbClient = prisma,
+  ) {
+    return db.shortLink.findUnique({
       where: {
         customAlias,
       },
@@ -148,6 +153,18 @@ class LinksRepository {
     }
   }
 
+  async countNonDeletedByUserId(
+    userId: string,
+    db: LinksDbClient = prisma,
+  ): Promise<number> {
+    return db.shortLink.count({
+      where: {
+        userId,
+        deletedAt: null,
+      },
+    })
+  }
+
   async update(id: string, data: UpdateShortLinkData) {
     return prisma.shortLink.update({
       where: {
@@ -167,6 +184,39 @@ class LinksRepository {
         deletedAt: new Date(),
       },
     })
+  }
+
+  async acquireQuotaCreateLock(
+    tx: Prisma.TransactionClient,
+    userId: string,
+  ): Promise<void> {
+    const [firstKey, secondKey] = this.toAdvisoryLockKeys(userId)
+
+    await tx.$executeRaw`
+      SELECT pg_advisory_xact_lock(${firstKey}, ${secondKey})
+    `
+  }
+
+  private toAdvisoryLockKeys(userId: string): [number, number] {
+    const normalizedUserId = userId.replace(/-/g, '')
+
+    if (normalizedUserId.length !== 32) {
+      throw new Error('Invalid UUID provided for advisory lock.')
+    }
+
+    const parts: [number, number, number, number] = [
+      Number.parseInt(normalizedUserId.slice(0, 8), 16),
+      Number.parseInt(normalizedUserId.slice(8, 16), 16),
+      Number.parseInt(normalizedUserId.slice(16, 24), 16),
+      Number.parseInt(normalizedUserId.slice(24, 32), 16),
+    ]
+
+    const toSigned32BitInteger = (value: number) => (value | 0)
+
+    return [
+      toSigned32BitInteger(parts[0] ^ parts[2]),
+      toSigned32BitInteger(parts[1] ^ parts[3]),
+    ]
   }
 }
 

@@ -1,6 +1,9 @@
 import { randomBytes } from 'node:crypto'
+import type { Prisma } from '@prisma/client'
+import { prisma } from '../../shared/config/prisma.js'
 import { AppError } from '../../shared/errors/app-error.js'
 import { redirectCacheService } from '../redirects/redirect-cache.service.js'
+import { LINKS_PER_USER_LIMIT } from './links.constants.js'
 import { linksRepository } from './links.repository.js'
 import { toLinkResponse } from './links.mapper.js'
 import type {
@@ -47,21 +50,30 @@ class LinksService {
     const originalUrl = normalizeUrl(data.originalUrl)
     const customAlias = data.customAlias ?? null
 
-    if (customAlias) {
-      await this.ensureShortCodeIsAvailable(customAlias)
-    }
+    const link = await prisma.$transaction(async (tx) => {
+      await linksRepository.acquireQuotaCreateLock(tx, userId)
+      await this.ensureUserHasQuota(userId, tx)
 
-    const shortCode = customAlias ?? (await this.generateUniqueShortCode())
+      if (customAlias) {
+        await this.ensureShortCodeIsAvailable(customAlias, undefined, tx)
+      }
 
-    const link = await linksRepository.create({
-      userId,
-      originalUrl,
-      shortCode,
-      customAlias,
-      title: data.title ?? null,
-      description: data.description ?? null,
-      expiresAt: data.expiresAt ?? null,
-      maxClicks: data.maxClicks ?? null,
+      const shortCode =
+        customAlias ?? (await this.generateUniqueShortCode(tx))
+
+      return linksRepository.create(
+        {
+          userId,
+          originalUrl,
+          shortCode,
+          customAlias,
+          title: data.title ?? null,
+          description: data.description ?? null,
+          expiresAt: data.expiresAt ?? null,
+          maxClicks: data.maxClicks ?? null,
+        },
+        tx,
+      )
     })
 
     return toLinkResponse(link)
@@ -71,6 +83,8 @@ class LinksService {
     userId: string,
     filters: ListLinksQuery,
   ): Promise<PaginatedResult<LinkResponse>> {
+    const userNonDeletedLinksCount =
+      await linksRepository.countNonDeletedByUserId(userId)
     const { links, totalItems } = await linksRepository.listByUser(
       userId,
       filters,
@@ -85,6 +99,11 @@ class LinksService {
         limit: filters.limit,
         totalItems,
         totalPages,
+      },
+      quota: {
+        limit: LINKS_PER_USER_LIMIT,
+        used: userNonDeletedLinksCount,
+        remaining: Math.max(0, LINKS_PER_USER_LIMIT - userNonDeletedLinksCount),
       },
     }
   }
@@ -193,12 +212,14 @@ class LinksService {
     return link
   }
 
-  private async generateUniqueShortCode(): Promise<string> {
+  private async generateUniqueShortCode(
+    db?: Prisma.TransactionClient,
+  ): Promise<string> {
     const maxAttempts = 5
 
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       const shortCode = generateShortCode()
-      const existingLink = await linksRepository.findByShortCode(shortCode)
+      const existingLink = await linksRepository.findByShortCode(shortCode, db)
 
       if (!existingLink) {
         return shortCode
@@ -211,17 +232,32 @@ class LinksService {
   private async ensureShortCodeIsAvailable(
     shortCode: string,
     currentLinkId?: string,
+    db?: Prisma.TransactionClient,
   ): Promise<void> {
-    const existingByShortCode = await linksRepository.findByShortCode(shortCode)
+    const existingByShortCode = await linksRepository.findByShortCode(
+      shortCode,
+      db,
+    )
 
     if (existingByShortCode && existingByShortCode.id !== currentLinkId) {
-      throw AppError.conflict('This short code is already in use.')
+      throw AppError.conflict(
+        'This short code is already in use.',
+        undefined,
+        'CONFLICT',
+      )
     }
 
-    const existingByAlias = await linksRepository.findByCustomAlias(shortCode)
+    const existingByAlias = await linksRepository.findByCustomAlias(
+      shortCode,
+      db,
+    )
 
     if (existingByAlias && existingByAlias.id !== currentLinkId) {
-      throw AppError.conflict('This alias is already in use.')
+      throw AppError.conflict(
+        'This alias is already in use.',
+        undefined,
+        'CONFLICT',
+      )
     }
   }
 
@@ -229,6 +265,22 @@ class LinksService {
     ...shortCodes: Array<string | null | undefined>
   ): Promise<void> {
     await redirectCacheService.invalidateMany(shortCodes)
+  }
+
+  private async ensureUserHasQuota(
+    userId: string,
+    db?: Prisma.TransactionClient,
+  ): Promise<void> {
+    const userNonDeletedLinksCount =
+      await linksRepository.countNonDeletedByUserId(userId, db)
+
+    if (userNonDeletedLinksCount >= LINKS_PER_USER_LIMIT) {
+      throw AppError.forbidden(
+        'You have reached the maximum limit of 15 links.',
+        undefined,
+        'LINK_LIMIT_REACHED',
+      )
+    }
   }
 }
 
