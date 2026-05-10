@@ -20,6 +20,10 @@ const textAreaClasses =
   'min-h-24 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-ring'
 
 function getCreateErrorMessage(error: ApiError) {
+  if (error.code === 'LINK_LIMIT_REACHED') {
+    return 'You have reached the maximum limit of 15 links.'
+  }
+
   if (error.code === 'CONFLICT') {
     return 'This alias is already in use. Choose another alias.'
   }
