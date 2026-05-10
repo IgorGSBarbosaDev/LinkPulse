@@ -1,17 +1,21 @@
 import { AlertTriangle } from 'lucide-react'
 
+import type { ReactNode } from 'react'
+
 import { Button } from '../ui/button'
 
 type ErrorStateProps = {
   title?: string
   description?: string
   onRetry?: () => void
+  action?: ReactNode
 }
 
 export function ErrorState({
   title = 'Something went wrong',
   description = 'The request could not be completed. Try again.',
   onRetry,
+  action,
 }: ErrorStateProps) {
   return (
     <div className="rounded-lg border border-border bg-card p-6">
@@ -25,11 +29,11 @@ export function ErrorState({
             </p>
           </div>
         </div>
-        {onRetry ? (
+        {action ?? (onRetry ? (
           <Button onClick={onRetry} size="sm" variant="secondary">
             Retry
           </Button>
-        ) : null}
+        ) : null)}
       </div>
     </div>
   )
