@@ -23,28 +23,5 @@ export type LoginResponse = {
 }
 
 export type RegisterResponse = AuthUser & {
-  createdAt?: string
-}
-
-export type RegisteredUser = AuthUser & {
-  emailVerifiedAt: string | null
   createdAt: string
-}
-
-export type EmailVerificationRegisterResponse = {
-  message: string
-  emailVerificationRequired: true
-  user: RegisteredUser
-}
-
-export type VerifyEmailRequest = {
-  token: string
-}
-
-export type ResendVerificationEmailRequest = {
-  email: string
-}
-
-export type MessageResponse = {
-  message: string
 }

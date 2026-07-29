@@ -6,19 +6,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { LoginForm } from './login-form'
 
 const loginAsync = vi.fn()
-const resendVerificationEmailAsync = vi.fn()
 
 vi.mock('../hooks/use-auth', () => ({
   useAuth: () => ({
     isLoggingIn: false,
     loginAsync,
-  }),
-}))
-
-vi.mock('../hooks/use-email-verification', () => ({
-  useEmailVerification: () => ({
-    isResendingVerificationEmail: false,
-    resendVerificationEmailAsync,
   }),
 }))
 
@@ -41,12 +33,12 @@ describe('LoginForm', () => {
     ).toBeInTheDocument()
   })
 
-  it('shows resend action when login is blocked by unverified email', async () => {
+  it('shows the API error when login fails', async () => {
     const user = userEvent.setup()
     loginAsync.mockRejectedValue({
-      code: 'EMAIL_NOT_VERIFIED',
-      message: 'Please verify your email before logging in.',
-      status: 403,
+      code: 'UNAUTHORIZED',
+      message: 'Invalid credentials',
+      status: 401,
     })
 
     render(
@@ -59,14 +51,6 @@ describe('LoginForm', () => {
     await user.type(screen.getByLabelText(/password/i), '12345')
     await user.click(screen.getByRole('button', { name: /sign in/i }))
 
-    expect(
-      await screen.findByText(/your account has not been verified yet/i),
-    ).toBeInTheDocument()
-
-    await user.click(screen.getByRole('button', { name: /resend verification email/i }))
-
-    expect(resendVerificationEmailAsync).toHaveBeenCalledWith({
-      email: 'igor@email.com',
-    })
+    expect(await screen.findByText('Invalid credentials')).toBeInTheDocument()
   })
 })

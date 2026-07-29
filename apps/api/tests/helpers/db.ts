@@ -18,7 +18,6 @@ type CreateLinkOverrides = {
 export async function resetDatabase() {
   await prisma.linkAccessEvent.deleteMany()
   await prisma.shortLink.deleteMany()
-  await prisma.emailVerificationToken.deleteMany()
   await prisma.user.deleteMany()
 }
 
@@ -31,7 +30,6 @@ export async function createUser(overrides: CreateUserOverrides = {}) {
       name: overrides.name ?? `User ${id.slice(0, 8)}`,
       email: overrides.email ?? `${id}@example.com`,
       passwordHash: 'hashed-password',
-      emailVerifiedAt: new Date('2026-01-01T00:00:00.000Z'),
     },
   })
 }

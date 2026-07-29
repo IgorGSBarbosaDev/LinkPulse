@@ -34,49 +34,6 @@ const envSchema = z.object({
     .string()
     .default('1h'),
 
-  EMAIL_PROVIDER: z
-    .enum(['console', 'smtp'])
-    .default('console'),
-
-  EMAIL_FROM: z
-    .string()
-    .min(1)
-    .default('LinkPulse <no-reply@linkpulse.app>'),
-
-  EMAIL_VERIFICATION_TOKEN_EXPIRES_IN_MINUTES: z.coerce
-    .number()
-    .int()
-    .positive()
-    .default(60),
-
-  EMAIL_VERIFICATION_URL: z
-    .string()
-    .url()
-    .default('http://localhost:5173/verify-email'),
-
-  SMTP_HOST: z
-    .string()
-    .default(''),
-
-  SMTP_PORT: z.coerce
-    .number()
-    .int()
-    .positive()
-    .default(587),
-
-  SMTP_USER: z
-    .string()
-    .default(''),
-
-  SMTP_PASS: z
-    .string()
-    .default(''),
-
-  SMTP_SECURE: z
-    .enum(['true', 'false'])
-    .default('false')
-    .transform((value) => value === 'true'),
-
   APP_BASE_URL: z
     .string()
     .url()
@@ -130,18 +87,6 @@ const envSchema = z.object({
     .default(5),
 
   RATE_LIMIT_REGISTER_WINDOW_SECONDS: z.coerce
-    .number()
-    .int()
-    .positive()
-    .default(3600),
-
-  RATE_LIMIT_EMAIL_VERIFICATION_RESEND_MAX: z.coerce
-    .number()
-    .int()
-    .positive()
-    .default(3),
-
-  RATE_LIMIT_EMAIL_VERIFICATION_RESEND_WINDOW_SECONDS: z.coerce
     .number()
     .int()
     .positive()

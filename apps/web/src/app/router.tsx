@@ -1,10 +1,8 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 
 import { LinkAnalyticsPage } from '../features/analytics/pages/link-analytics-page'
-import { EmailVerificationSentPage } from '../features/auth/pages/email-verification-sent-page'
 import { LoginPage } from '../features/auth/pages/login-page'
 import { RegisterPage } from '../features/auth/pages/register-page'
-import { VerifyEmailPage } from '../features/auth/pages/verify-email-page'
 import { DashboardPage } from '../features/dashboard/pages/dashboard-page'
 import { CreateLinkPage } from '../features/links/pages/create-link-page'
 import { EditLinkPage } from '../features/links/pages/edit-link-page'
@@ -23,8 +21,6 @@ export function AppRouter() {
       <Route element={<PublicRoute />}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/email-verification-sent" element={<EmailVerificationSentPage />} />
-        <Route path="/verify-email" element={<VerifyEmailPage />} />
       </Route>
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>

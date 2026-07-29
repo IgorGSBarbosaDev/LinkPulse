@@ -4,8 +4,6 @@ import { AppError } from '../../shared/errors/app-error.js'
 import type {
     LoginInput,
     RegisterInput,
-    ResendVerificationEmailInput,
-    VerifyEmailInput,
 } from './auth.types.js'
 
 type AuthenticatedRequest = Request & {
@@ -61,31 +59,4 @@ export class AuthController {
         }
     }
 
-    static verifyEmail = async (
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> => {
-        try {
-            const input = req.body as VerifyEmailInput
-            const response = await AuthService.verifyEmail(input)
-            res.status(200).json(response)
-        } catch (error) {
-            next(error)
-        }
-    }
-
-    static resendVerificationEmail = async (
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> => {
-        try {
-            const input = req.body as ResendVerificationEmailInput
-            const response = await AuthService.resendVerificationEmail(input)
-            res.status(200).json(response)
-        } catch (error) {
-            next(error)
-        }
-    }
 }

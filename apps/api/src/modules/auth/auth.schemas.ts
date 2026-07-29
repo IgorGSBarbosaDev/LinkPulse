@@ -37,20 +37,3 @@ export const loginSchema = z.object({
     .min(1, 'Password is required')
     }),
 })
-
-export const verifyEmailSchema = z.object({
-    body: z.object({
-        token: z.string().trim().min(1, 'Token is required'),
-    }),
-})
-
-export const resendVerificationEmailSchema = z.object({
-    body: z.object({
-        email: z
-        .string()
-        .trim()
-        .email('Invalid email')
-        .max(180, 'Email must have at most 180 characters')
-        .toLowerCase(),
-    }),
-})

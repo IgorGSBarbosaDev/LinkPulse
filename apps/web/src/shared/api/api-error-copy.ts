@@ -58,46 +58,6 @@ export function toApiErrorCopy(
     }
   }
 
-  if (error.code === 'EMAIL_NOT_VERIFIED') {
-    return {
-      title: 'Email verification required',
-      description:
-        'Your account has not been verified yet. Use the link sent to your email or request a new one.',
-    }
-  }
-
-  if (error.code === 'INVALID_VERIFICATION_TOKEN') {
-    return {
-      title: 'Invalid verification link',
-      description:
-        'This verification link cannot be used. Request a new verification email and try again.',
-    }
-  }
-
-  if (error.code === 'VERIFICATION_TOKEN_EXPIRED') {
-    return {
-      title: 'Verification link expired',
-      description:
-        'Verification token expired. Request a new email to continue.',
-    }
-  }
-
-  if (error.code === 'VERIFICATION_TOKEN_ALREADY_USED') {
-    return {
-      title: 'Email already verified',
-      description:
-        'This link was already used. You can sign in with your verified account.',
-    }
-  }
-
-  if (error.code === 'VERIFICATION_TOKEN_REVOKED') {
-    return {
-      title: 'Verification link replaced',
-      description:
-        'This link was replaced by a newer one. Request a new verification email if you cannot find the latest link.',
-    }
-  }
-
   if (error.code === 'NETWORK_ERROR') {
     return {
       title: 'Network error',

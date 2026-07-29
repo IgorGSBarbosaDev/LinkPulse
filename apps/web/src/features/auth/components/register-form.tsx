@@ -33,19 +33,14 @@ export function RegisterForm() {
   async function onSubmit(values: RegisterFormValues) {
     try {
       await registerAsync(values)
-      navigate('/email-verification-sent', {
+      navigate('/login', {
         replace: true,
-        state: { email: values.email },
       })
     } catch (error) {
       const apiError = error as ApiError
-      const accountCreatedButEmailFailed =
-        apiError.message.includes('Account created, but verification email could not be sent')
 
       setError('root', {
-        message: accountCreatedButEmailFailed
-          ? 'Your account was created, but LinkPulse could not send the verification email. Go to login and request a new verification email.'
-          : apiError.message,
+        message: apiError.message,
       })
       toast.error(apiError.message)
     }
@@ -104,11 +99,6 @@ export function RegisterForm() {
       {errors.root ? (
         <div className="flex flex-col gap-3 rounded-md border border-border bg-background p-3 text-sm text-error">
           <p>{errors.root.message}</p>
-          {errors.root.message?.includes('could not send the verification email') ? (
-            <Link className="text-foreground hover:underline" to="/login">
-              Go to login
-            </Link>
-          ) : null}
         </div>
       ) : null}
 

@@ -1,14 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
-import { useForm, useWatch } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 
 import type { ApiError } from '../../../shared/api/api-error'
-import { toApiErrorCopy } from '../../../shared/api/api-error-copy'
 import { Button } from '../../../shared/components/ui/button'
 import { cn } from '../../../shared/lib/utils'
-import { useEmailVerification } from '../hooks/use-email-verification'
 import { useAuth } from '../hooks/use-auth'
 import { loginSchema, type LoginFormValues } from '../schemas/auth-schemas'
 
@@ -23,20 +20,16 @@ const inputClasses =
 
 export function LoginForm() {
   const { isLoggingIn, loginAsync } = useAuth()
-  const { isResendingVerificationEmail, resendVerificationEmailAsync } =
-    useEmailVerification()
   const navigate = useNavigate()
   const location = useLocation()
   const state = location.state as LocationState | null
   const returnPath = state?.from?.pathname ?? '/dashboard'
-  const [rootErrorCode, setRootErrorCode] = useState<ApiError['code'] | null>(null)
 
   const {
     formState: { errors },
     handleSubmit,
     register,
     setError,
-    control,
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -44,32 +37,13 @@ export function LoginForm() {
       password: '',
     },
   })
-  const currentEmail = useWatch({ control, name: 'email' })
-  const isEmailNotVerified = rootErrorCode === 'EMAIL_NOT_VERIFIED'
-
   async function onSubmit(values: LoginFormValues) {
     try {
-      setRootErrorCode(null)
       await loginAsync(values)
       navigate(returnPath, { replace: true })
     } catch (error) {
       const apiError = error as ApiError
-      const message =
-        apiError.code === 'EMAIL_NOT_VERIFIED'
-          ? toApiErrorCopy(apiError, 'Email verification required').description
-          : apiError.message
-      setRootErrorCode(apiError.code)
-      setError('root', { message })
-      toast.error(apiError.message)
-    }
-  }
-
-  async function handleResendVerificationEmail() {
-    try {
-      await resendVerificationEmailAsync({ email: currentEmail })
-      toast.success('Verification email sent.')
-    } catch (error) {
-      const apiError = error as ApiError
+      setError('root', { message: apiError.message })
       toast.error(apiError.message)
     }
   }
@@ -111,19 +85,6 @@ export function LoginForm() {
       {errors.root ? (
         <div className="flex flex-col gap-3 rounded-md border border-border bg-background p-3 text-sm text-error">
           <p>{errors.root.message}</p>
-          {isEmailNotVerified ? (
-            <Button
-              disabled={isResendingVerificationEmail || !currentEmail}
-              onClick={handleResendVerificationEmail}
-              size="sm"
-              type="button"
-              variant="secondary"
-            >
-              {isResendingVerificationEmail
-                ? 'Sending...'
-                : 'Resend verification email'}
-            </Button>
-          ) : null}
         </div>
       ) : null}
 
