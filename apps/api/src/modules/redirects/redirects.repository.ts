@@ -29,8 +29,8 @@ class RedirectsRepository {
 
   async recordAccessAndIncrementClickCount(
     data: RecordAccessAndIncrementInput,
-  ): Promise<void> {
-    await prisma.$transaction(async (tx) => {
+  ): Promise<number> {
+    return prisma.$transaction(async (tx) => {
       const currentLink = await tx.shortLink.findUnique({
         where: {
           id: data.shortLinkId,
@@ -62,7 +62,7 @@ class RedirectsRepository {
         },
       })
 
-      await tx.shortLink.update({
+      const updatedLink = await tx.shortLink.update({
         where: {
           id: data.shortLinkId,
         },
@@ -71,7 +71,12 @@ class RedirectsRepository {
             increment: 1,
           },
         },
+        select: {
+          clickCount: true,
+        },
       })
+
+      return updatedLink.clickCount
     })
   }
 }

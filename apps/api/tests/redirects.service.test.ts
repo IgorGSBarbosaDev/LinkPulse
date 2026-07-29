@@ -44,7 +44,7 @@ describe('redirectsService.resolveRedirect', () => {
       baseLink,
     )
     mockedRedirectsRepository.recordAccessAndIncrementClickCount.mockResolvedValue(
-      undefined,
+      3,
     )
 
     const result = await redirectsService.resolveRedirect({
@@ -62,7 +62,16 @@ describe('redirectsService.resolveRedirect', () => {
     expect(
       mockedRedirectsRepository.findRedirectLinkByShortCode,
     ).toHaveBeenCalledWith('abc123')
-    expect(mockedRedirectCacheService.set).toHaveBeenCalledTimes(1)
+    expect(mockedRedirectCacheService.set).toHaveBeenCalledTimes(2)
+    expect(mockedRedirectCacheService.set).toHaveBeenLastCalledWith({
+      id: 'link-id',
+      originalUrl: 'https://example.com/page',
+      shortCode: 'abc123',
+      active: true,
+      expiresAt: null,
+      maxClicks: null,
+      clickCount: 3,
+    })
     expect(
       mockedRedirectsRepository.recordAccessAndIncrementClickCount,
     ).toHaveBeenCalledWith({
@@ -84,7 +93,7 @@ describe('redirectsService.resolveRedirect', () => {
       clickCount: 3,
     })
     mockedRedirectsRepository.recordAccessAndIncrementClickCount.mockResolvedValue(
-      undefined,
+      4,
     )
 
     const result = await redirectsService.resolveRedirect({
@@ -102,10 +111,18 @@ describe('redirectsService.resolveRedirect', () => {
     expect(
       mockedRedirectsRepository.findRedirectLinkByShortCode,
     ).not.toHaveBeenCalled()
-    expect(mockedRedirectCacheService.set).not.toHaveBeenCalled()
     expect(
       mockedRedirectsRepository.recordAccessAndIncrementClickCount,
     ).toHaveBeenCalledTimes(1)
+    expect(mockedRedirectCacheService.set).toHaveBeenCalledWith({
+      id: 'link-id',
+      originalUrl: 'https://example.com/page',
+      shortCode: 'abc123',
+      active: true,
+      expiresAt: null,
+      maxClicks: null,
+      clickCount: 4,
+    })
   })
 
   it('handles repeated cached redirects without throwing 500-style runtime errors', async () => {
@@ -119,7 +136,7 @@ describe('redirectsService.resolveRedirect', () => {
       clickCount: 0,
     })
     mockedRedirectsRepository.recordAccessAndIncrementClickCount.mockResolvedValue(
-      undefined,
+      1,
     )
 
     const firstResult = await redirectsService.resolveRedirect({
@@ -156,9 +173,7 @@ describe('redirectsService.resolveRedirect', () => {
       maxClicks: 2,
       clickCount: 2,
     })
-    mockedRedirectsRepository.recordAccessAndIncrementClickCount.mockResolvedValue(
-      undefined,
-    )
+    mockedRedirectsRepository.recordAccessAndIncrementClickCount.mockResolvedValue(3)
 
     const result = await redirectsService.resolveRedirect({
       shortCode: 'abc123',
@@ -186,8 +201,8 @@ describe('redirectsService.resolveRedirect', () => {
       clickCount: 0,
     })
     mockedRedirectsRepository.recordAccessAndIncrementClickCount
-      .mockResolvedValueOnce(undefined)
-      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce(1)
+      .mockResolvedValueOnce(2)
       .mockRejectedValueOnce(AppError.gone('Link is no longer available.'))
 
     await redirectsService.resolveRedirect({

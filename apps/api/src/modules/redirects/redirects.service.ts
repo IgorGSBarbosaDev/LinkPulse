@@ -50,11 +50,22 @@ class RedirectsService {
     }
 
     try {
-      await redirectsRepository.recordAccessAndIncrementClickCount({
+      const updatedClickCount =
+        await redirectsRepository.recordAccessAndIncrementClickCount({
         shortLinkId: link.id,
         ipAddress: input.metadata.ipAddress,
         userAgent: input.metadata.userAgent,
         referer: input.metadata.referer,
+      })
+
+      await redirectCacheService.set({
+        id: link.id,
+        originalUrl: link.originalUrl,
+        shortCode: link.shortCode,
+        active: link.active,
+        expiresAt: link.expiresAt,
+        maxClicks: link.maxClicks,
+        clickCount: updatedClickCount,
       })
     } catch (error) {
       if (error instanceof AppError) {
