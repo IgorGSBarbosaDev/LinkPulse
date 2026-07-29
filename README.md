@@ -97,7 +97,17 @@ GET    /api/v1/analytics/top-links
 - `apps/api`: monólito modular Express/Prisma;
 - `apps/web`: frontend React organizado por feature;
 - `packages/shared`: workspace disponível para contratos realmente compartilhados;
-- `docs`: PRD, arquitetura, contrato, modelo de dados, decisões e roadmap.
+- `docs`: funcionamento, funcionalidades atuais, arquitetura, contrato, modelo de dados, decisões e deploy.
+
+## Documentação
+
+- [Como funciona](docs/como-funciona.md)
+- [Funcionalidades atuais](docs/funcionalidades-atuais.md)
+- [Contrato da API](docs/api-contract.md)
+- [Arquitetura](docs/architecture.md)
+- [Modelo de dados](docs/database-model.md)
+- [Decisões técnicas](docs/decisions.md)
+- [Deploy](docs/deploy.md)
 
 ## Preparação para deploy
 

@@ -5,11 +5,13 @@
 LinkPulse = fullstack monorepo for short links + analytics.
 
 Source of truth:
-- Product target: `./linkpulse_prd.md`
-- Extra docs: `./docs/*`
+- Product/current behavior: `./README.md` and `./docs/funcionalidades-atuais.md`
+- API contract: `./docs/api-contract.md`
+- Architecture and persistence: `./docs/architecture.md`, `./docs/database-model.md` and `./docs/decisions.md`
+- Deployment: `./docs/deploy.md`
 - Actual impl state: current code in `./apps/*` and `./packages/*`
 
-Rule: if PRD and code differ, treat code as "what exists now", PRD as "what build next".
+Rule: if documentation and code differ, treat the code as the current behavior and update the relevant documentation when the contract changes.
 
 ## Product
 
@@ -122,11 +124,13 @@ Avoid:
 - shared TS code/types
 
 `docs`
-- architecture
+- how the product works
+- current functionality inventory
 - API contract
+- architecture
 - DB model
 - decisions
-- roadmap
+- deployment
 
 ## Core Rules
 
