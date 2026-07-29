@@ -10,7 +10,6 @@ export type ApiErrorCode =
   | 'VALIDATION_ERROR'
   | 'NETWORK_ERROR'
   | 'UNKNOWN_ERROR'
-  | 'LINK_LIMIT_REACHED'
 
 type ErrorPayload = {
   code?: string

@@ -33,12 +33,6 @@ export function LinksPage() {
   const pagination = linksQuery.data?.pagination
   const hasActiveFilters = Boolean(filters.search.trim()) || filters.active !== 'all'
   const totalLinks = pagination?.totalItems ?? links.length
-  const quota = linksQuery.data?.quota ?? {
-    limit: 15,
-    used: totalLinks,
-    remaining: Math.max(0, 15 - totalLinks),
-  }
-  const hasReachedLinkQuota = quota.used >= quota.limit
   const activeLinks = links.filter((link) => link.active).length
   const expiredLinks = links.filter((link) => link.expired).length
   const totalClicks = links.reduce((sum, link) => sum + link.clickCount, 0)
@@ -48,29 +42,14 @@ export function LinksPage() {
       title="Links"
       description="Manage short links, filter by status, and run quick actions."
       actions={
-        hasReachedLinkQuota ? (
-          <Button disabled size="sm" variant="primary">
+        <Link to="/links/new">
+          <Button size="sm" variant="primary">
             New link
           </Button>
-        ) : (
-          <Link to="/links/new">
-            <Button size="sm" variant="primary">
-              New link
-            </Button>
-          </Link>
-        )
+        </Link>
       }
     >
       <div className="flex flex-col gap-6">
-        <div className="rounded-md border border-border bg-surface px-4 py-2.5 text-sm text-foreground">
-          <span className="font-medium">Links used:</span> {quota.used}/{quota.limit}
-          {hasReachedLinkQuota ? (
-            <p className="mt-1 text-xs text-error">
-              You have reached the maximum limit of 15 links.
-            </p>
-          ) : null}
-        </div>
-
         <LinkFilters filters={filters} onChange={updateFilters} />
 
         {linksQuery.isLoading ? <LoadingState label="Loading links" /> : null}
@@ -114,17 +93,11 @@ export function LinksPage() {
               title="No links yet"
               description="Create your first short link to start tracking clicks."
               action={
-                hasReachedLinkQuota ? (
-                  <Button disabled size="sm" variant="primary">
+                <Link to="/links/new">
+                  <Button size="sm" variant="primary">
                     New link
                   </Button>
-                ) : (
-                  <Link to="/links/new">
-                    <Button size="sm" variant="primary">
-                      New link
-                    </Button>
-                  </Link>
-                )
+                </Link>
               }
             />
           )

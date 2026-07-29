@@ -153,18 +153,6 @@ class LinksRepository {
     }
   }
 
-  async countNonDeletedByUserId(
-    userId: string,
-    db: LinksDbClient = prisma,
-  ): Promise<number> {
-    return db.shortLink.count({
-      where: {
-        userId,
-        deletedAt: null,
-      },
-    })
-  }
-
   async update(id: string, data: UpdateShortLinkData) {
     return prisma.shortLink.update({
       where: {
@@ -186,38 +174,6 @@ class LinksRepository {
     })
   }
 
-  async acquireQuotaCreateLock(
-    tx: Prisma.TransactionClient,
-    userId: string,
-  ): Promise<void> {
-    const [firstKey, secondKey] = this.toAdvisoryLockKeys(userId)
-
-    await tx.$executeRaw`
-      SELECT pg_advisory_xact_lock(${firstKey}, ${secondKey})
-    `
-  }
-
-  private toAdvisoryLockKeys(userId: string): [number, number] {
-    const normalizedUserId = userId.replace(/-/g, '')
-
-    if (normalizedUserId.length !== 32) {
-      throw new Error('Invalid UUID provided for advisory lock.')
-    }
-
-    const parts: [number, number, number, number] = [
-      Number.parseInt(normalizedUserId.slice(0, 8), 16),
-      Number.parseInt(normalizedUserId.slice(8, 16), 16),
-      Number.parseInt(normalizedUserId.slice(16, 24), 16),
-      Number.parseInt(normalizedUserId.slice(24, 32), 16),
-    ]
-
-    const toSigned32BitInteger = (value: number) => (value | 0)
-
-    return [
-      toSigned32BitInteger(parts[0] ^ parts[2]),
-      toSigned32BitInteger(parts[1] ^ parts[3]),
-    ]
-  }
 }
 
 export const linksRepository = new LinksRepository()

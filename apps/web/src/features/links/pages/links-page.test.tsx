@@ -36,16 +36,11 @@ const baseData = {
   },
 }
 
-describe('LinksPage quota', () => {
-  it('renders quota and keeps New link enabled when below limit', () => {
+describe('LinksPage', () => {
+  it('keeps New link enabled without a per-user quota', () => {
     useLinksMock.mockReturnValue({
       data: {
         ...baseData,
-        quota: {
-          limit: 15,
-          used: 14,
-          remaining: 1,
-        },
       },
       isError: false,
       isLoading: false,
@@ -58,39 +53,9 @@ describe('LinksPage quota', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.getByText('Links used:')).toBeInTheDocument()
-    expect(screen.getByText('14/15')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /new link/i })).toHaveAttribute(
       'href',
       '/links/new',
     )
-  })
-
-  it('renders quota reached state and disables New link', () => {
-    useLinksMock.mockReturnValue({
-      data: {
-        ...baseData,
-        quota: {
-          limit: 15,
-          used: 15,
-          remaining: 0,
-        },
-      },
-      isError: false,
-      isLoading: false,
-      isSuccess: true,
-    })
-
-    render(
-      <MemoryRouter>
-        <LinksPage />
-      </MemoryRouter>,
-    )
-
-    expect(screen.getByText('15/15')).toBeInTheDocument()
-    expect(
-      screen.getByText('You have reached the maximum limit of 15 links.'),
-    ).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /new link/i })).toBeDisabled()
   })
 })

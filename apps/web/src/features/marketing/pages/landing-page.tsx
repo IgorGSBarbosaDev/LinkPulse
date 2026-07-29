@@ -129,20 +129,20 @@ export function LandingPage() {
               <div className="flex flex-col gap-4">
                 <div className="flex-1 rounded-md border border-muted bg-card p-4">
                   <p className="text-xs font-medium uppercase tracking-label text-muted-foreground">
-                    Top Referrer
+                    Decisoes mais rapidas
                   </p>
-                  <p className="mt-2 text-[20px] font-semibold leading-[1.4] tracking-[-0.01em] text-primary">github.com</p>
+                  <p className="mt-2 text-[20px] font-semibold leading-[1.4] tracking-[-0.01em] text-primary">Em tempo real</p>
                   <p className="mt-1 flex items-center gap-1 text-[13px] leading-[1.5] text-muted-foreground">
-                    <span className="material-symbols-outlined text-[14px]">arrow_upward</span>
-                    12.4%
+                    <span className="material-symbols-outlined text-[14px]">bolt</span>
+                    Aja no momento certo
                   </p>
                 </div>
                 <div className="flex-1 rounded-md border border-muted bg-card p-4">
                   <p className="text-xs font-medium uppercase tracking-label text-muted-foreground">
-                    Active Links
+                    Campanhas sob controle
                   </p>
-                  <p className="mt-2 text-[20px] font-semibold leading-[1.4] tracking-[-0.01em] text-primary">1,048</p>
-                  <p className="mt-1 text-[13px] leading-[1.5] text-muted-foreground">Across 12 campaigns</p>
+                  <p className="mt-2 text-[20px] font-semibold leading-[1.4] tracking-[-0.01em] text-primary">1 painel</p>
+                  <p className="mt-1 text-[13px] leading-[1.5] text-muted-foreground">Links, cliques e resultados</p>
                 </div>
               </div>
             </div>

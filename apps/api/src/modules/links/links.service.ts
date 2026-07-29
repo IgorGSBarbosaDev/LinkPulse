@@ -3,7 +3,6 @@ import type { Prisma } from '@prisma/client'
 import { prisma } from '../../shared/config/prisma.js'
 import { AppError } from '../../shared/errors/app-error.js'
 import { redirectCacheService } from '../redirects/redirect-cache.service.js'
-import { LINKS_PER_USER_LIMIT } from './links.constants.js'
 import { linksRepository } from './links.repository.js'
 import { toLinkResponse } from './links.mapper.js'
 import type {
@@ -51,9 +50,6 @@ class LinksService {
     const customAlias = data.customAlias ?? null
 
     const link = await prisma.$transaction(async (tx) => {
-      await linksRepository.acquireQuotaCreateLock(tx, userId)
-      await this.ensureUserHasQuota(userId, tx)
-
       if (customAlias) {
         await this.ensureShortCodeIsAvailable(customAlias, undefined, tx)
       }
@@ -83,8 +79,6 @@ class LinksService {
     userId: string,
     filters: ListLinksQuery,
   ): Promise<PaginatedResult<LinkResponse>> {
-    const userNonDeletedLinksCount =
-      await linksRepository.countNonDeletedByUserId(userId)
     const { links, totalItems } = await linksRepository.listByUser(
       userId,
       filters,
@@ -99,11 +93,6 @@ class LinksService {
         limit: filters.limit,
         totalItems,
         totalPages,
-      },
-      quota: {
-        limit: LINKS_PER_USER_LIMIT,
-        used: userNonDeletedLinksCount,
-        remaining: Math.max(0, LINKS_PER_USER_LIMIT - userNonDeletedLinksCount),
       },
     }
   }
@@ -267,21 +256,6 @@ class LinksService {
     await redirectCacheService.invalidateMany(shortCodes)
   }
 
-  private async ensureUserHasQuota(
-    userId: string,
-    db?: Prisma.TransactionClient,
-  ): Promise<void> {
-    const userNonDeletedLinksCount =
-      await linksRepository.countNonDeletedByUserId(userId, db)
-
-    if (userNonDeletedLinksCount >= LINKS_PER_USER_LIMIT) {
-      throw AppError.forbidden(
-        'You have reached the maximum limit of 15 links.',
-        undefined,
-        'LINK_LIMIT_REACHED',
-      )
-    }
-  }
 }
 
 export const linksService = new LinksService()

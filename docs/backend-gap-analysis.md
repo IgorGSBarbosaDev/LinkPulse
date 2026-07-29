@@ -7,7 +7,7 @@ Este documento substitui a análise histórica anterior e descreve o estado do b
 ## Estado atual
 
 - Auth simples com cadastro, login, JWT, bcrypt e `/me`.
-- Links CRUD com ownership, filtros, paginação, quota e soft delete.
+- Links CRUD com ownership, filtros, paginação e soft delete.
 - Redirect público com expiração, status, limite de cliques e evento transacional.
 - Analytics básico baseado em eventos PostgreSQL.
 - Redis usado para cache de redirect e rate limit.
@@ -27,7 +27,7 @@ Este documento substitui a análise histórica anterior e descreve o estado do b
 
 - O cache de redirect é atualizado após cada clique válido com o `clickCount` retornado pela transação PostgreSQL, mantendo o PostgreSQL como fonte de verdade sem perder o cache persistente.
 - O workspace `packages/shared` permanece disponível, com scripts válidos, mas não recebe tipos artificialmente duplicados sem necessidade real de reutilização.
-- A execução completa depende de PostgreSQL e Redis acessíveis; sem essas dependências a suíte de quota e os fluxos manuais não podem ser considerados validados.
+- A execução manual completa depende de PostgreSQL e Redis acessíveis para validar persistência, redirect, analytics, cache e rate limit.
 
 ## Critério de aceite backend
 

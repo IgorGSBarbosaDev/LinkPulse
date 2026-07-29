@@ -67,8 +67,6 @@ npm run prisma:generate
 npm run prisma:migrate
 ```
 
-Para os testes de integração de quota, o PostgreSQL de teste deve existir e ser apontado por `DATABASE_URL_TEST`.
-
 ## API principal
 
 ```text

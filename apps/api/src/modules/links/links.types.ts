@@ -29,11 +29,6 @@ export type Pagination = {
 export type PaginatedResult<T> = {
     data: T[]
     pagination: Pagination
-    quota: {
-        limit: number
-        used: number
-        remaining: number
-    }
 }
 
 export type LinkResponse ={

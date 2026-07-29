@@ -36,11 +36,6 @@ export type LinksPagination = {
 export type ListLinksResponse = {
   data: LinkListItem[]
   pagination: LinksPagination
-  quota: {
-    limit: number
-    used: number
-    remaining: number
-  }
 }
 
 export type LinksFilters = {

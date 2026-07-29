@@ -32,9 +32,6 @@ Endpoint público de redirecionamento:
 /r/:shortCode
 ```
 
-Para testes automatizados da API que dependem de PostgreSQL real (quota e concorrência), configure `DATABASE_URL_TEST`.
-Se `DATABASE_URL_TEST` não estiver definido, os testes usam `DATABASE_URL`.
-
 ---
 
 ## 2. Autenticação
@@ -249,9 +246,6 @@ Authorization: Bearer <token>
 - `customAlias` deve aceitar letras, números, hífen e underscore.
 - `expiresAt`, se informado, deve ser data futura.
 - `maxClicks`, se informado, deve ser maior que zero.
-- cada usuário autenticado pode ter no máximo 15 links não removidos (`deletedAt = null`).
-- links inativos contam para o limite.
-- links com soft delete liberam espaço no limite.
 
 ### Response `201`
 
@@ -275,7 +269,6 @@ Authorization: Bearer <token>
 
 | Caso | Status | `code` |
 |---|---:|---|
-| Limite de links por usuário atingido | 403 | `LINK_LIMIT_REACHED` |
 | Alias já em uso | 409 | `CONFLICT` |
 | Rate limit excedido | 429 | `RATE_LIMITED` |
 
@@ -327,11 +320,6 @@ Authorization: Bearer <token>
     "limit": 10,
     "totalItems": 42,
     "totalPages": 5
-  },
-  "quota": {
-    "limit": 15,
-    "used": 9,
-    "remaining": 6
   }
 }
 ```
