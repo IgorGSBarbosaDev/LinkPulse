@@ -44,7 +44,6 @@ Um usuário pode criar vários links.
 | `name` | String | sim | Nome do usuário |
 | `email` | String | sim | E-mail único |
 | `passwordHash` | String | sim | Hash da senha |
-| `emailVerifiedAt` | DateTime nullable | não | Data de verificação do e-mail |
 | `createdAt` | DateTime | sim | Data de criação |
 | `updatedAt` | DateTime | sim | Data da última atualização |
 
@@ -53,43 +52,13 @@ Um usuário pode criar vários links.
 - `email` deve ser único.
 - `passwordHash` nunca deve ser retornado em responses.
 - senha deve ser armazenada com bcrypt.
-- login deve ser bloqueado enquanto `emailVerifiedAt` estiver vazio.
 - usuário só pode acessar recursos próprios.
 
 ## Relacionamentos
 
 ```txt
 User 1:N ShortLink
-User 1:N EmailVerificationToken
 ```
-
----
-
-# 3.1 EmailVerificationToken
-
-## Descrição
-
-Representa token temporário e de uso único para ativar conta por e-mail.
-
-## Campos
-
-| Campo | Tipo | Obrigatório | Descrição |
-|---|---|---:|---|
-| `id` | String UUID | sim | Identificador único |
-| `userId` | String UUID | sim | Usuário dono do token |
-| `tokenHash` | String | sim | Hash SHA-256 do token puro |
-| `expiresAt` | DateTime | sim | Data de expiração |
-| `usedAt` | DateTime nullable | não | Data de uso |
-| `revokedAt` | DateTime nullable | não | Data de revogação |
-| `createdAt` | DateTime | sim | Data de criação |
-
-## Regras
-
-- token puro nunca deve ser salvo;
-- `tokenHash` deve ser único;
-- token expirado, usado ou revogado não ativa conta;
-- reenvio revoga tokens anteriores não usados;
-- remoção do usuário remove tokens em cascata.
 
 ---
 

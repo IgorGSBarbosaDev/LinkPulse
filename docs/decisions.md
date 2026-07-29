@@ -609,26 +609,7 @@ Usar soft delete em `ShortLink`.
 
 ---
 
-# 21. Validação de cadastro por e-mail
-
-## Escolha
-
-Cadastro cria usuário com `emailVerifiedAt = null`, gera token seguro, salva apenas hash do token e envia e-mail de ativação. Login fica bloqueado até validação.
-
-## Motivos
-
-- reduz contas falsas;
-- mantém fluxo de auth simples;
-- evita usuário autenticado parcialmente;
-- adiciona rate limit em cadastro e reenvio.
-
-## Decisão final
-
-Usar provider `console` em desenvolvimento, SMTP em produção, tokens temporários de uso único e resposta genérica no reenvio.
-
----
-
-# 22. Resumo das decisões
+# 21. Resumo das decisões
 
 | Área | Decisão |
 |---|---|
@@ -642,7 +623,6 @@ Usar provider `console` em desenvolvimento, SMTP em produção, tokens temporár
 | ORM | Prisma |
 | Validação | Zod |
 | Auth | JWT + bcrypt |
-| Email verification | Token seguro, hash no banco, SMTP/console |
 | Cache | Redis |
 | Rate limit | Redis |
 | UI | Tailwind CSS + shadcn/ui |

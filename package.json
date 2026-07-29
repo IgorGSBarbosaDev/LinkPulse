@@ -7,6 +7,9 @@
     "doc": "docs"
   },
   "scripts": {
+    "dev": "concurrently -k \"npm run dev:api\" \"npm run dev:web\"",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces",
     "test": "npm run test --workspaces",
     "predev:api": "docker compose up -d postgres redis",
     "dev:api": "npm run dev -w apps/api",

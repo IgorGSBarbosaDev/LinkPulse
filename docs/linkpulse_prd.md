@@ -1385,6 +1385,7 @@ NODE_ENV=development
 PORT=3000
 
 DATABASE_URL=postgresql://linkpulse:linkpulse@localhost:55432/linkpulse
+DATABASE_URL_TEST=postgresql://linkpulse:linkpulse@localhost:55432/linkpulse_test
 
 REDIS_URL=redis://localhost:6379
 
@@ -1394,8 +1395,16 @@ JWT_EXPIRES_IN=1h
 APP_BASE_URL=http://localhost:3000
 FRONTEND_URL=http://localhost:5173
 
+REDIRECT_CACHE_TTL_SECONDS=3600
+
 RATE_LIMIT_REDIRECT_MAX=100
 RATE_LIMIT_REDIRECT_WINDOW_SECONDS=60
+
+RATE_LIMIT_LOGIN_MAX=10
+RATE_LIMIT_LOGIN_WINDOW_SECONDS=60
+
+RATE_LIMIT_REGISTER_MAX=5
+RATE_LIMIT_REGISTER_WINDOW_SECONDS=3600
 
 RATE_LIMIT_CREATE_LINK_MAX=20
 RATE_LIMIT_CREATE_LINK_WINDOW_SECONDS=3600
@@ -1426,7 +1435,7 @@ services:
       POSTGRES_USER: linkpulse
       POSTGRES_PASSWORD: linkpulse
     ports:
-      - "5432:5432"
+      - "55432:5432"
     volumes:
       - linkpulse_postgres_data:/var/lib/postgresql/data
 
@@ -2340,7 +2349,7 @@ O projeto será considerado bem-sucedido quando:
 
 ---
 
-## 31. Scripts sugeridos no monorepo
+## 31. Scripts do monorepo
 
 ### `package.json` da raiz
 
@@ -2354,30 +2363,13 @@ O projeto será considerado bem-sucedido quando:
     "packages/shared"
   ],
   "scripts": {
-    "dev": "npm run dev --workspace=apps/api & npm run dev --workspace=apps/web",
-    "dev:api": "npm run dev --workspace=apps/api",
-    "dev:web": "npm run dev --workspace=apps/web",
+    "dev": "concurrently -k \"npm run dev:api\" \"npm run dev:web\"",
+    "dev:api": "npm run dev -w apps/api",
+    "dev:web": "npm run dev -w apps/web",
     "build": "npm run build --workspaces",
-    "test": "npm run test --workspaces",
-    "lint": "npm run lint --workspaces"
-  }
-}
-```
-
-Observação: em Windows, o script com `&` pode precisar ser substituído por uma ferramenta como `concurrently`.
-
-Sugestão:
-
-```bash
-npm install -D concurrently
-```
-
-Script alternativo:
-
-```json
-{
-  "scripts": {
-    "dev": "concurrently \"npm run dev --workspace=apps/api\" \"npm run dev --workspace=apps/web\""
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces",
+    "test": "npm run test --workspaces"
   }
 }
 ```

@@ -37,7 +37,6 @@ O projeto deve demonstrar:
 
 - Cadastro de usuário.
 - Login.
-- Validação de cadastro por e-mail.
 - Geração de token JWT.
 - Hash de senha com bcrypt.
 - Rota para obter o usuário autenticado.
@@ -335,9 +334,11 @@ linkpulse/
 ```json
 {
   "scripts": {
-    "dev": "concurrently \"npm run dev -w apps/api\" \"npm run dev -w apps/web\"",
+    "dev": "concurrently -k \"npm run dev:api\" \"npm run dev:web\"",
     "dev:api": "npm run dev -w apps/api",
     "dev:web": "npm run dev -w apps/web",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces",
     "build": "npm run build --workspaces",
     "test": "npm run test --workspaces",
     "prisma:generate": "npm run prisma:generate -w apps/api",
@@ -356,7 +357,7 @@ git clone <repo-url>
 cd linkpulse
 npm install
 docker compose up -d
-npm run prisma:migrate -- --name init
+npm run prisma:migrate
 npm run dev
 ```
 
@@ -375,7 +376,7 @@ Docs UI: http://localhost:3000/docs
 
 Para autorizar endpoints protegidos no Swagger UI:
 - FaÃ§a login em `POST /api/v1/auth/login`.
-- Copie valor de `acessToken` retornado.
+- Copie valor de `accessToken` retornado.
 - Clique em **Authorize** no Swagger UI.
 - Informe: `Bearer <seu_token>`.
 
@@ -389,28 +390,21 @@ Para autorizar endpoints protegidos no Swagger UI:
 NODE_ENV=development
 PORT=3000
 DATABASE_URL=postgresql://linkpulse:linkpulse@localhost:55432/linkpulse
+DATABASE_URL_TEST=postgresql://linkpulse:linkpulse@localhost:55432/linkpulse_test
 REDIS_URL=redis://localhost:6379
-JWT_SECRET=change-this-secret
-JWT_EXPIRES_IN=1h
-EMAIL_PROVIDER=console
-EMAIL_FROM="LinkPulse <no-reply@linkpulse.app>"
-EMAIL_VERIFICATION_TOKEN_EXPIRES_IN_MINUTES=60
-EMAIL_VERIFICATION_URL=http://localhost:5173/verify-email
-SMTP_HOST=
-SMTP_PORT=587
-SMTP_USER=
-SMTP_PASS=
-SMTP_SECURE=false
-APP_BASE_URL=http://localhost:3000
-FRONTEND_URL=http://localhost:5173
+REDIRECT_CACHE_TTL_SECONDS=3600
 RATE_LIMIT_REDIRECT_MAX=100
 RATE_LIMIT_REDIRECT_WINDOW_SECONDS=60
+RATE_LIMIT_LOGIN_MAX=10
+RATE_LIMIT_LOGIN_WINDOW_SECONDS=60
 RATE_LIMIT_REGISTER_MAX=5
 RATE_LIMIT_REGISTER_WINDOW_SECONDS=3600
-RATE_LIMIT_EMAIL_VERIFICATION_RESEND_MAX=3
-RATE_LIMIT_EMAIL_VERIFICATION_RESEND_WINDOW_SECONDS=3600
 RATE_LIMIT_CREATE_LINK_MAX=20
 RATE_LIMIT_CREATE_LINK_WINDOW_SECONDS=3600
+JWT_SECRET=change-this-secret
+JWT_EXPIRES_IN=1h
+APP_BASE_URL=http://localhost:3000
+FRONTEND_URL=http://localhost:5173
 ```
 
 ### Frontend
@@ -429,8 +423,6 @@ VITE_APP_NAME=LinkPulse
 ```http
 POST /api/v1/auth/register
 POST /api/v1/auth/login
-POST /api/v1/auth/verify-email
-POST /api/v1/auth/resend-verification-email
 GET  /api/v1/auth/me
 ```
 

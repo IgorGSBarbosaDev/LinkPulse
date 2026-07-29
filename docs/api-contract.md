@@ -123,15 +123,10 @@ POST /api/v1/auth/register
 
 ```json
 {
-  "message": "Account created. Please verify your email before logging in.",
-  "emailVerificationRequired": true,
-  "user": {
-    "id": "uuid",
-    "name": "Igor",
-    "email": "igor@email.com",
-    "emailVerifiedAt": null,
-    "createdAt": "2026-05-04T20:00:00.000Z"
-  }
+  "id": "uuid",
+  "name": "Igor",
+  "email": "igor@email.com",
+  "createdAt": "2026-05-04T20:00:00.000Z"
 }
 ```
 
@@ -181,76 +176,11 @@ POST /api/v1/auth/login
 |---|---:|
 | Dados inválidos | 400 |
 | Credenciais inválidas | 401 |
-| E-mail não verificado | 403 |
 | Rate limit excedido | 429 |
 
 ---
 
-## 5.3 Verificar e-mail
-
-```http
-POST /api/v1/auth/verify-email
-```
-
-### Request
-
-```json
-{
-  "token": "plain-token-from-email"
-}
-```
-
-### Response `200`
-
-```json
-{
-  "message": "Email verified successfully. You can now log in."
-}
-```
-
-### Erros possíveis
-
-| Caso | Status | `code` |
-|---|---:|---|
-| Token ausente | 400 | `VALIDATION_ERROR` |
-| Token inválido | 400 | `INVALID_VERIFICATION_TOKEN` |
-| Token expirado | 410 | `VERIFICATION_TOKEN_EXPIRED` |
-| Token usado | 409 | `VERIFICATION_TOKEN_ALREADY_USED` |
-| Token revogado | 410 | `VERIFICATION_TOKEN_REVOKED` |
-
----
-
-## 5.4 Reenviar e-mail de verificação
-
-```http
-POST /api/v1/auth/resend-verification-email
-```
-
-### Request
-
-```json
-{
-  "email": "igor@email.com"
-}
-```
-
-### Response `200`
-
-```json
-{
-  "message": "If this email is registered and not verified, a new verification link will be sent."
-}
-```
-
-Regras:
-
-- resposta genérica para não revelar se o e-mail existe;
-- rate limit por IP e e-mail normalizado;
-- tokens anteriores não usados são revogados antes de novo envio.
-
----
-
-## 5.5 Usuário autenticado
+## 5.3 Usuário autenticado
 
 ```http
 GET /api/v1/auth/me

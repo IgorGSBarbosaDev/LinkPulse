@@ -69,7 +69,7 @@ Configurar PostgreSQL e Redis para desenvolvimento local.
 ## Critérios de aceite
 
 - `docker compose up -d` sobe PostgreSQL e Redis.
-- PostgreSQL acessível em `localhost:5432`.
+- PostgreSQL acessível em `localhost:55432`.
 - Redis acessível em `localhost:6379`.
 
 ---
