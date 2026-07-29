@@ -2,8 +2,8 @@ import express from 'express'
 import request from 'supertest'
 import { describe, expect, it } from 'vitest'
 
-import { AppError } from '../../shared/errors/app-error.js'
-import { errorHandler } from '../../shared/errors/error-handler.js'
+import { AppError } from '../src/shared/errors/app-error.js'
+import { errorHandler } from '../src/shared/errors/error-handler.js'
 
 function createRedirectErrorApp(error: Error) {
   const app = express()
