@@ -68,3 +68,9 @@ export const analyticsEventsQuerySchema = z.object({
   }),
 })
 
+export const dashboardQuerySchema = z.object({
+  query: z.object({
+    range: z.enum(['1m', '3m', '6m', '1y']).default('3m'),
+  }),
+})
+

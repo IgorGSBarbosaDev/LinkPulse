@@ -11,6 +11,7 @@ vi.mock('../src/modules/analytics/analytics.repository.js', () => ({
     findClicksByDay: vi.fn(),
     listEvents: vi.fn(),
     listTopLinks: vi.fn(),
+    getDashboardData: vi.fn(),
   },
 }))
 
@@ -162,6 +163,51 @@ describe('analyticsService', () => {
         clickCount: 8,
       },
     ])
+  })
+
+  it('builds dashboard metrics from one aggregated repository result', async () => {
+    const today = new Date().toISOString().slice(0, 10)
+
+    mockedRepository.getDashboardData.mockResolvedValue({
+      links: [
+        {
+          ...ownedLink,
+          userId: 'user-1',
+          originalUrl: 'https://example.com/a',
+          customAlias: null,
+          title: 'A',
+          description: null,
+          active: true,
+          expiresAt: null,
+          maxClicks: null,
+          deletedAt: null,
+          createdAt: new Date('2026-04-01T00:00:00.000Z'),
+          updatedAt: new Date('2026-04-01T00:00:00.000Z'),
+        },
+      ],
+      clicksByDay: [{ date: today, clicks: 2 }],
+      recentEvents: [],
+    })
+
+    const result = await analyticsService.getDashboard('user-1', { range: '3m' })
+
+    expect(result.summary).toMatchObject({
+      totalLinks: 1,
+      totalClicks: 25,
+      activeLinks: 1,
+      clicksToday: 2,
+      clicksLast7Days: 2,
+    })
+    expect(result.topLinks).toEqual([
+      {
+        id: ownedLink.id,
+        title: 'A',
+        shortCode: ownedLink.shortCode,
+        shortUrl: 'http://localhost:3000/r/abc123',
+        clickCount: 25,
+      },
+    ])
+    expect(mockedRepository.getDashboardData).toHaveBeenCalledTimes(1)
   })
 })
 

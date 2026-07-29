@@ -4,6 +4,7 @@ import { analyticsService } from './analytics.service.js'
 import type {
   AnalyticsEventsQuery,
   ClicksByDayQuery,
+  DashboardQuery,
 } from './analytics.types.js'
 
 type AuthenticatedRequest = Request & {
@@ -89,6 +90,21 @@ class AnalyticsController {
     try {
       const userId = getAuthenticatedUserId(req)
       const result = await analyticsService.getTopLinks(userId)
+      return res.status(200).json(result)
+    } catch (error) {
+      return next(error)
+    }
+  }
+
+  getDashboard = async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const userId = getAuthenticatedUserId(req)
+      const query = req.query as unknown as DashboardQuery
+      const result = await analyticsService.getDashboard(userId, query)
       return res.status(200).json(result)
     } catch (error) {
       return next(error)

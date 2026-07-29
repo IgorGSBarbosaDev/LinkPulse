@@ -7,6 +7,7 @@ const getSummaryMock = vi.fn()
 const getClicksByDayMock = vi.fn()
 const getEventsMock = vi.fn()
 const getTopLinksMock = vi.fn()
+const getDashboardMock = vi.fn()
 
 vi.mock('../src/modules/analytics/analytics.service.js', () => ({
   analyticsService: {
@@ -14,6 +15,7 @@ vi.mock('../src/modules/analytics/analytics.service.js', () => ({
     getClicksByDay: getClicksByDayMock,
     getEvents: getEventsMock,
     getTopLinks: getTopLinksMock,
+    getDashboard: getDashboardMock,
   },
 }))
 
@@ -180,6 +182,38 @@ describe('analytics routes', () => {
         clickCount: 12,
       },
     ])
+  })
+
+  it('returns the aggregated dashboard payload', async () => {
+    const { app } = await import('../src/app.js')
+    const token = buildToken()
+
+    getDashboardMock.mockResolvedValue({
+      summary: {
+        totalLinks: 2,
+        totalClicks: 12,
+        activeLinks: 1,
+        clicksToday: 2,
+        clicksLast7Days: 8,
+      },
+      clicksByDay: [{ date: '2026-04-30', clicks: 2 }],
+      topLinks: [],
+      recentLinks: [],
+    })
+
+    const response = await request(app)
+      .get('/api/v1/analytics/dashboard?range=3m')
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(response.status).toBe(200)
+    expect(response.body.summary).toMatchObject({
+      totalLinks: 2,
+      totalClicks: 12,
+    })
+    expect(getDashboardMock).toHaveBeenCalledWith(
+      'f7ad2caa-87e7-4fd9-8ff8-ef18c43445f1',
+      { range: '3m' },
+    )
   })
 })
 

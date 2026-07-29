@@ -6,9 +6,12 @@ import type {
   AnalyticsSummary,
   ClicksByDayItem,
   ClicksByDayQuery,
+  DashboardData,
+  DashboardQuery,
   PaginatedAnalyticsEvents,
   TopLinkItem,
 } from './analytics.types.js'
+import { buildShortUrl } from '../links/links.mapper.js'
 
 function startOfUtcDay(date: Date): Date {
   return new Date(
@@ -107,6 +110,57 @@ class AnalyticsService {
     }))
   }
 
+  async getDashboard(
+    userId: string,
+    query: DashboardQuery,
+  ): Promise<DashboardData> {
+    const { start, endExclusive } = this.resolveDashboardDateRange(query)
+    const { links, clicksByDay, recentEvents } =
+      await analyticsRepository.getDashboardData(userId, start, endExclusive)
+
+    const today = toDateOnly(startOfUtcDay(new Date()))
+    const last7DaysStart = toDateOnly(addUtcDays(startOfUtcDay(new Date()), -6))
+    const totalClicks = links.reduce((sum, link) => sum + link.clickCount, 0)
+
+    const topLinks = [...links]
+      .sort((left, right) => right.clickCount - left.clickCount)
+      .slice(0, 10)
+      .map((link) => ({
+        id: link.id,
+        title: link.title,
+        shortCode: link.shortCode,
+        shortUrl: buildShortUrl(link.shortCode),
+        clickCount: link.clickCount,
+      }))
+
+    const recentLinks = recentEvents.map((event) => ({
+        linkId: event.linkId,
+        shortCode: event.shortCode,
+        shortUrl: buildShortUrl(event.shortCode),
+        title: event.title,
+        active: event.active,
+        clickCount: event.clickCount,
+        lastAccessAt: event.accessedAt,
+      }))
+
+    return {
+      summary: {
+        totalLinks: links.length,
+        totalClicks,
+        activeLinks: links.filter((link) => link.active).length,
+        clicksToday: clicksByDay
+          .filter((item) => item.date === today)
+          .reduce((sum, item) => sum + item.clicks, 0),
+        clicksLast7Days: clicksByDay
+          .filter((item) => item.date >= last7DaysStart)
+          .reduce((sum, item) => sum + item.clicks, 0),
+      },
+      clicksByDay,
+      topLinks,
+      recentLinks,
+    }
+  }
+
   private async getOwnedLinkOrFail(userId: string, linkId: string) {
     const link = await analyticsRepository.findOwnedLinkOrNull(linkId, userId)
 
@@ -137,6 +191,38 @@ class AnalyticsService {
       endExclusive: addUtcDays(todayStart, 1),
     }
   }
+
+  private resolveDashboardDateRange(query: DashboardQuery): {
+    start: Date
+    endExclusive: Date
+  } {
+    const todayStart = startOfUtcDay(new Date())
+    const start = new Date(todayStart)
+
+    switch (query.range) {
+      case '1m':
+        start.setUTCMonth(start.getUTCMonth() - 1)
+        break
+      case '3m':
+        start.setUTCMonth(start.getUTCMonth() - 3)
+        break
+      case '6m':
+        start.setUTCMonth(start.getUTCMonth() - 6)
+        break
+      case '1y':
+        start.setUTCFullYear(start.getUTCFullYear() - 1)
+        break
+    }
+
+    return {
+      start,
+      endExclusive: addUtcDays(todayStart, 1),
+    }
+  }
+}
+
+function toDateOnly(value: Date) {
+  return value.toISOString().slice(0, 10)
 }
 
 export const analyticsService = new AnalyticsService()

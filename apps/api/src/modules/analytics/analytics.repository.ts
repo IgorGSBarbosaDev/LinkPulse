@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client'
+import { Prisma, type ShortLink } from '@prisma/client'
 import { prisma } from '../../shared/config/prisma.js'
 
 type OwnedLinkRecord = {
@@ -10,6 +10,16 @@ type OwnedLinkRecord = {
 type ClicksByDayRow = {
   date: string
   clicks: bigint
+}
+
+type DashboardRecentEvent = {
+  id: string
+  accessedAt: Date
+  linkId: string
+  shortCode: string
+  title: string | null
+  active: boolean
+  clickCount: number
 }
 
 class AnalyticsRepository {
@@ -136,6 +146,77 @@ class AnalyticsRepository {
         clickCount: true,
       },
     })
+  }
+
+  async getDashboardData(
+    userId: string,
+    start: Date,
+    endExclusive: Date,
+  ): Promise<{
+    links: ShortLink[]
+    clicksByDay: Array<{ date: string; clicks: number }>
+    recentEvents: DashboardRecentEvent[]
+  }> {
+    const [links, clicksByDayRows, recentEvents] = await Promise.all([
+      prisma.shortLink.findMany({
+        where: {
+          userId,
+          deletedAt: null,
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      }),
+      prisma.$queryRaw<ClicksByDayRow[]>(Prisma.sql`
+        SELECT
+          to_char(date_trunc('day', e."accessedAt"), 'YYYY-MM-DD') AS date,
+          COUNT(*)::bigint AS clicks
+        FROM "link_access_events" e
+        INNER JOIN "short_links" l ON l."id" = e."shortLinkId"
+        WHERE l."userId" = ${userId}::uuid
+          AND l."deletedAt" IS NULL
+          AND e."accessedAt" >= ${start}
+          AND e."accessedAt" < ${endExclusive}
+        GROUP BY date_trunc('day', e."accessedAt")
+        ORDER BY date_trunc('day', e."accessedAt") ASC
+      `),
+      prisma.$queryRaw<DashboardRecentEvent[]>(Prisma.sql`
+        SELECT
+          latest."id",
+          latest."accessedAt",
+          latest."linkId",
+          latest."shortCode",
+          latest."title",
+          latest."active",
+          latest."clickCount"
+        FROM (
+          SELECT DISTINCT ON (e."shortLinkId")
+            e."id",
+            e."accessedAt",
+            l."id" AS "linkId",
+            l."shortCode",
+            l."title",
+            l."active",
+            l."clickCount"
+          FROM "link_access_events" e
+          INNER JOIN "short_links" l ON l."id" = e."shortLinkId"
+          WHERE l."userId" = ${userId}::uuid
+            AND l."deletedAt" IS NULL
+          ORDER BY e."shortLinkId", e."accessedAt" DESC
+        ) latest
+        ORDER BY latest."accessedAt" DESC
+        LIMIT 10
+      `),
+    ])
+
+    return {
+      links,
+      clicksByDay: clicksByDayRows.map((row) => ({
+        date: row.date,
+        clicks: Number(row.clicks),
+      })),
+      recentEvents,
+    }
   }
 }
 

@@ -623,6 +623,33 @@ GET /api/v1/analytics/top-links
 ]
 ```
 
+## 8.5 Dashboard agregado
+
+```http
+GET /api/v1/analytics/dashboard?range=3m
+```
+
+`range` aceita `1m`, `3m`, `6m` ou `1y` e tem `3m` como padrão.
+
+### Response `200`
+
+```json
+{
+  "summary": {
+    "totalLinks": 4,
+    "totalClicks": 120,
+    "activeLinks": 3,
+    "clicksToday": 12,
+    "clicksLast7Days": 84
+  },
+  "clicksByDay": [{ "date": "2026-04-22", "clicks": 35 }],
+  "topLinks": [],
+  "recentLinks": []
+}
+```
+
+O endpoint é autenticado e consulta somente links do usuário atual. Ele evita que o frontend faça uma consulta de analytics para cada link.
+
 ---
 
 # 9. Health check
@@ -637,12 +664,21 @@ GET /health
 {
   "status": "ok",
   "app": "LinkPulse API",
+  "timestamp": "2026-04-23T18:30:00.000Z",
+  "uptimeSeconds": 120,
+  "requestId": "f7ad2caa-87e7-4fd9-8ff8-ef18c43445f1",
   "dependencies": {
     "postgres": "up",
     "redis": "up"
+  },
+  "checks": {
+    "postgres": { "status": "up", "latencyMs": 3 },
+    "redis": { "status": "up", "latencyMs": 1 }
   }
 }
 ```
+
+Toda resposta inclui o header `X-Request-Id`. Logs de requisição são emitidos em JSON com método, rota, status, duração e request ID.
 
 ---
 

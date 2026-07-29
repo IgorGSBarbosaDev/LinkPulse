@@ -6,6 +6,7 @@ import {
   analyticsEventsQuerySchema,
   analyticsLinkIdParamsSchema,
   clicksByDayQuerySchema,
+  dashboardQuerySchema,
 } from './analytics.schemas.js'
 
 export const analyticsRoutes = Router()
@@ -28,6 +29,12 @@ analyticsRoutes.get(
   '/links/:id/analytics/events',
   validateRequest(analyticsEventsQuerySchema),
   analyticsController.getEvents,
+)
+
+analyticsRoutes.get(
+  '/analytics/dashboard',
+  validateRequest(dashboardQuerySchema),
+  analyticsController.getDashboard,
 )
 
 analyticsRoutes.get(
