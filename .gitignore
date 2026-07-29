@@ -57,7 +57,10 @@ Thumbs.db
 # Optional local Docker overrides
 docker-compose.override.yml
 
-# Ignore design documents
-/docs/design
-
 /.codex-screenshots
+
+# Generated Prisma config output
+/apps/api/prisma.config.js
+/apps/api/prisma.config.js.map
+/apps/api/prisma.config.d.ts
+/apps/api/prisma.config.d.ts.map
