@@ -7,6 +7,7 @@ import {
     sendRedirectErrorPage,
     shouldRenderRedirectErrorPage,
 } from '../../modules/redirects/redirect-error-page.js'
+import { logger } from '../observability/logger.js'
 
 type ErrorResponse = {
     statusCode: number
@@ -17,6 +18,7 @@ type ErrorResponse = {
         field?: string
         message: string
      }[]
+    requestId?: string | undefined
 }
 
 function getUniqueConstraintMessage(
@@ -56,6 +58,7 @@ export function errorHandler(
             error: error.error,
             message: error.message,
             details: error.details,
+            requestId: (req as Request & { requestId?: string }).requestId,
         }
 
         if (error.code) {
@@ -69,14 +72,15 @@ export function errorHandler(
             return sendRedirectErrorPage(req, res, 400)
         }
 
-        return res.status(400).json({
+      return res.status(400).json({
             statusCode: 400,
             error: 'Bad Request',
             message: 'Invalid request data',
-            details: error.issues.map((issue) => ({
+        details: error.issues.map((issue) => ({
                 field: issue.path.join('.'),
                 message: issue.message,
-            })),
+        })),
+        requestId: (req as Request & { requestId?: string }).requestId,
         })
     }
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -91,6 +95,7 @@ export function errorHandler(
         message: getUniqueConstraintMessage(error),
         code: 'CONFLICT',
         details: [],
+        requestId: (req as Request & { requestId?: string }).requestId,
       })
     }
 
@@ -104,12 +109,16 @@ export function errorHandler(
             error: ErrorCode.NOT_FOUND,
             message: 'Resource not found',
             details: [],
+            requestId: (req as Request & { requestId?: string }).requestId,
         })
     }
 }
-    if (process.env.NODE_ENV !== 'production') {
-        console.error(error)
-    }
+    logger.error('http.request.failed', {
+        requestId: (req as Request & { requestId?: string }).requestId,
+        method: req.method,
+        path: req.originalUrl,
+        error: error instanceof Error ? error.message : String(error),
+    })
 
     if (shouldRenderRedirectErrorPage(req)) {
         return sendRedirectErrorPage(req, res, 500)
@@ -120,5 +129,6 @@ export function errorHandler(
         error: ErrorCode.INTERNAL_SERVER_ERROR,
         message: 'An unexpected internal server error',
         details: [],
+        requestId: (req as Request & { requestId?: string }).requestId,
     })
 }

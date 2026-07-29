@@ -2,6 +2,7 @@ import { app } from './app.js'
 import { env } from './shared/config/env.js'
 import { prisma } from './shared/config/prisma.js'
 import { connectRedis, disconnectRedis } from './shared/config/redis.js'
+import { logger } from './shared/observability/logger.js'
 
 const port = env.PORT
 
@@ -11,7 +12,7 @@ async function startServer() {
     await connectRedis()
 
     const server = app.listen(port, () => {
-      console.log(`API running on port ${port}`)
+      logger.info('api.started', { port })
     })
 
     const shutdown = async () => {
@@ -27,7 +28,9 @@ async function startServer() {
     process.on('SIGINT', shutdown)
     process.on('SIGTERM', shutdown)
   } catch (error) {
-    console.error('Failed to start server:', error)
+    logger.error('api.start_failed', {
+      error: error instanceof Error ? error.message : String(error),
+    })
     await Promise.allSettled([
       prisma.$disconnect(),
       disconnectRedis(),

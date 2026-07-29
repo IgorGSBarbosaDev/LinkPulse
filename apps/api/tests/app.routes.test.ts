@@ -23,7 +23,12 @@ describe('app base routes', () => {
         postgres: expect.stringMatching(/^(up|down)$/),
         redis: expect.stringMatching(/^(up|down)$/),
       },
+      checks: {
+        postgres: { status: expect.stringMatching(/^(up|down)$/) },
+        redis: { status: expect.stringMatching(/^(up|down)$/) },
+      },
     })
+    expect(response.headers['x-request-id']).toMatch(/^[a-z0-9-]+$/i)
   })
 
   it('allows CORS for localhost frontend origin', async () => {

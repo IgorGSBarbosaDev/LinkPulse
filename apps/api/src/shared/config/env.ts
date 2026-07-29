@@ -44,6 +44,11 @@ const envSchema = z.object({
     .url()
     .default('http://localhost:5173'),
 
+  APP_VERSION: z
+    .string()
+    .min(1)
+    .default('0.1.0'),
+
   RATE_LIMIT_REDIRECT_MAX: z.coerce
     .number()
     .int()

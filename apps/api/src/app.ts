@@ -10,6 +10,8 @@ import { notFoundMiddleware } from './shared/middlewares/not-found.middleware.js
 import { swaggerServe, swaggerSetup } from './shared/config/swagger.js'
 import { prisma } from './shared/config/prisma.js'
 import { redis } from './shared/config/redis.js'
+import { env } from './shared/config/env.js'
+import { requestContextMiddleware } from './shared/middlewares/request-context.middleware.js'
 
 import { authRoutes } from './modules/auth/auth.routes.js'
 import { analyticsRoutes } from './modules/analytics/analytics.routes.js'
@@ -31,6 +33,7 @@ function isAllowedDevelopmentOrigin(origin: string) {
 }
 
 app.use(helmet())
+app.use(requestContextMiddleware)
 
 app.use(
   cors({
@@ -59,15 +62,21 @@ app.use('/docs', swaggerServe, swaggerSetup)
 app.get('/health', async (_req, res) => {
   let postgres: 'up' | 'down' = 'up'
   let redisStatus: 'up' | 'down' = 'up'
+  let postgresLatencyMs = 0
+  let redisLatencyMs = 0
 
   try {
+    const startedAt = Date.now()
     await prisma.$queryRawUnsafe('SELECT 1')
+    postgresLatencyMs = Date.now() - startedAt
   } catch {
     postgres = 'down'
   }
 
   try {
+    const startedAt = Date.now()
     await redis.ping()
+    redisLatencyMs = Date.now() - startedAt
   } catch {
     redisStatus = 'down'
   }
@@ -79,9 +88,17 @@ app.get('/health', async (_req, res) => {
   return res.status(statusCode).json({
     status,
     app: 'LinkPulse API',
+    timestamp: new Date().toISOString(),
+    uptimeSeconds: Math.floor(process.uptime()),
+    version: env.APP_VERSION,
+    requestId: (_req as unknown as { requestId?: string }).requestId,
     dependencies: {
       postgres,
       redis: redisStatus,
+    },
+    checks: {
+      postgres: { status: postgres, latencyMs: postgresLatencyMs },
+      redis: { status: redisStatus, latencyMs: redisLatencyMs },
     },
   })
 })
