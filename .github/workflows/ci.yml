@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [main, 'hardening/**']
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Start infrastructure
+        run: docker compose up -d postgres redis
+
+      - name: Wait for PostgreSQL
+        run: |
+          for attempt in {1..30}; do
+            docker compose exec -T postgres pg_isready -U linkpulse -d linkpulse && break
+            sleep 2
+          done
+
+      - name: Create isolated test database
+        run: docker compose exec -T postgres createdb -U linkpulse linkpulse_test || true
+
+      - name: Configure test environment
+        run: |
+          echo "DATABASE_URL=postgresql://linkpulse:linkpulse@localhost:55432/linkpulse" >> "$GITHUB_ENV"
+          echo "DATABASE_URL_TEST=postgresql://linkpulse:linkpulse@localhost:55432/linkpulse_test" >> "$GITHUB_ENV"
+          echo "REDIS_URL=redis://localhost:6379" >> "$GITHUB_ENV"
+          echo "JWT_SECRET=ci-test-secret-with-more-than-16-chars" >> "$GITHUB_ENV"
+
+      - name: Apply test migrations
+        run: DATABASE_URL="$DATABASE_URL_TEST" npm run prisma:migrate -w apps/api
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Tests
+        run: npm test
+
+      - name: Coverage
+        run: npm run coverage
+
+      - name: Build
+        run: npm run build
+
+      - name: Apply application migrations
+        run: npm run prisma:migrate -w apps/api
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: End-to-end test
+        run: npm run test:e2e

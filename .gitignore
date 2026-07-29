@@ -9,6 +9,8 @@ node_modules/
 **/.env
 **/.env.*
 !**/.env.example
+!.env.production.example
+!**/.env.production.example
 
 # Build and test outputs
 **/dist/
@@ -18,6 +20,8 @@ node_modules/
 **/.cache/
 **/.vite/
 **/*.tsbuildinfo
+playwright-report/
+test-results/
 
 # Logs
 logs/

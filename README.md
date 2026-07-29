@@ -12,6 +12,8 @@ LinkPulse é uma aplicação fullstack para criação, gerenciamento e análise 
 - Redis para cache de redirect e rate limit;
 - PostgreSQL como fonte de verdade;
 - dashboard React com métricas, tabela e gráfico.
+- dashboard agregado em uma única consulta autenticada;
+- cobertura Vitest, CI GitHub Actions e fluxo E2E Playwright.
 
 Verificação de e-mail, refresh token, login social, recuperação de senha, times, domínios customizados, QR Code, exportações e analytics avançados não fazem parte deste MVP.
 
@@ -63,6 +65,8 @@ npm run lint
 npm run typecheck
 npm run build
 npm test
+npm run coverage
+npm run test:e2e
 npm run prisma:generate
 npm run prisma:migrate
 ```
@@ -84,6 +88,7 @@ GET    /r/:shortCode
 GET    /api/v1/links/:id/analytics/summary
 GET    /api/v1/links/:id/analytics/clicks-by-day
 GET    /api/v1/links/:id/analytics/events
+GET    /api/v1/analytics/dashboard?range=3m
 GET    /api/v1/analytics/top-links
 ```
 
@@ -93,3 +98,7 @@ GET    /api/v1/analytics/top-links
 - `apps/web`: frontend React organizado por feature;
 - `packages/shared`: workspace disponível para contratos realmente compartilhados;
 - `docs`: PRD, arquitetura, contrato, modelo de dados, decisões e roadmap.
+
+## Preparação para deploy
+
+Os Dockerfiles da API e do web ficam em `apps/api/Dockerfile` e `apps/web/Dockerfile`. Variáveis de produção estão em `apps/api/.env.production.example` e `apps/web/.env.production.example`; o container da API executa `prisma migrate deploy` antes de iniciar. Consulte [docs/deploy.md](docs/deploy.md). Nenhum deploy externo é realizado pelo repositório.
