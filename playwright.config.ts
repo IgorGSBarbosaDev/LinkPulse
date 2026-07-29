@@ -23,6 +23,9 @@ export default defineConfig({
         JWT_SECRET: 'e2e-test-secret-with-more-than-16-chars',
         APP_BASE_URL: 'http://127.0.0.1:3000',
         FRONTEND_URL: 'http://127.0.0.1:5173',
+        RATE_LIMIT_REGISTER_MAX: '1000',
+        RATE_LIMIT_LOGIN_MAX: '1000',
+        RATE_LIMIT_CREATE_LINK_MAX: '1000',
       },
     },
     {
