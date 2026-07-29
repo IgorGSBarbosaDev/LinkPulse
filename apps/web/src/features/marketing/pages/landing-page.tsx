@@ -19,7 +19,7 @@ export function LandingPage() {
             Suas metricas, encurtadas para o essencial.
           </h1>
           <p className="mb-8 max-w-xl text-sm leading-[1.6] text-muted-foreground">
-            LinkPulse e o encurtador de links tecnico para quem precisa de controle total e analytics de alta precisao em um piscar de olhos.
+            LinkPulse é um encurtador de links técnico para criar, administrar e acompanhar cliques com clareza.
           </p>
           <div className="flex w-full max-w-sm flex-col items-center gap-2">
             <Link
@@ -56,7 +56,7 @@ export function LandingPage() {
               <h2 className="text-[20px] font-semibold leading-[1.4] tracking-[-0.01em] text-primary">Precisao</h2>
             </div>
             <p className="text-sm leading-[1.6] text-muted-foreground">
-              Analytics de alta fidelidade que mostram cada clique, localizacao, dispositivo e referenciador em tempo real. Sem ruido, apenas dados acionaveis.
+              Analytics básicos com total de cliques, série diária e acessos recentes, incluindo user-agent e referer quando disponíveis.
             </p>
           </article>
           <article className="rounded-md border border-muted bg-card p-6 transition-colors duration-300 hover:bg-muted">
@@ -65,7 +65,7 @@ export function LandingPage() {
               <h2 className="text-[20px] font-semibold leading-[1.4] tracking-[-0.01em] text-primary">Controle Total</h2>
             </div>
             <p className="text-sm leading-[1.6] text-muted-foreground">
-              Defina regras de expiracao precisas, limites absolutos de cliques e rotas condicionais baseadas em parametros UTM.
+              Defina expiração, limite máximo de cliques e o estado ativo ou inativo de cada link.
             </p>
           </article>
           <article className="rounded-md border border-muted bg-card p-6 transition-colors duration-300 hover:bg-muted">
@@ -74,7 +74,7 @@ export function LandingPage() {
               <h2 className="text-[20px] font-semibold leading-[1.4] tracking-[-0.01em] text-primary">Design</h2>
             </div>
             <p className="text-sm leading-[1.6] text-muted-foreground">
-              Uma interface rigorosamente focada na sua produtividade. Layout em grade, alta densidade de informacao e zero distracoes visuais.
+              Uma interface focada na produtividade para criar links, revisar métricas e executar ações rápidas.
             </p>
           </article>
           <article className="rounded-md border border-muted bg-card p-6 transition-colors duration-300 hover:bg-muted">
@@ -83,7 +83,7 @@ export function LandingPage() {
               <h2 className="text-[20px] font-semibold leading-[1.4] tracking-[-0.01em] text-primary">Seguranca</h2>
             </div>
             <p className="text-sm leading-[1.6] text-muted-foreground">
-              Proteja seus links corporativos com senhas robustas e garanta a integridade da sua conta com MFA padrao da industria.
+              JWT, bcrypt, rate limit e regras de ownership protegem as contas e os links do MVP.
             </p>
           </article>
         </section>
@@ -107,9 +107,9 @@ export function LandingPage() {
                 <div className="mb-4 flex items-start justify-between">
                   <div>
                     <p className="text-xs font-medium uppercase tracking-label text-muted-foreground">
-                      Total Clicks (7d)
+                      Cliques registrados
                     </p>
-                    <p className="mt-1 text-2xl font-semibold leading-[1.3] tracking-[-0.02em] text-primary">124,592</p>
+                    <p className="mt-1 text-2xl font-semibold leading-[1.3] tracking-[-0.02em] text-primary">Analytics MVP</p>
                   </div>
                   <span className="material-symbols-outlined text-muted-foreground">more_horiz</span>
                 </div>
@@ -131,15 +131,15 @@ export function LandingPage() {
                   <p className="text-xs font-medium uppercase tracking-label text-muted-foreground">
                     Decisoes mais rapidas
                   </p>
-                  <p className="mt-2 text-[20px] font-semibold leading-[1.4] tracking-[-0.01em] text-primary">Em tempo real</p>
+                    <p className="mt-2 text-[20px] font-semibold leading-[1.4] tracking-[-0.01em] text-primary">Dados claros</p>
                   <p className="mt-1 flex items-center gap-1 text-[13px] leading-[1.5] text-muted-foreground">
                     <span className="material-symbols-outlined text-[14px]">bolt</span>
-                    Aja no momento certo
+                    Acompanhe cada acesso válido
                   </p>
                 </div>
                 <div className="flex-1 rounded-md border border-muted bg-card p-4">
                   <p className="text-xs font-medium uppercase tracking-label text-muted-foreground">
-                    Campanhas sob controle
+                    Links sob controle
                   </p>
                   <p className="mt-2 text-[20px] font-semibold leading-[1.4] tracking-[-0.01em] text-primary">1 painel</p>
                   <p className="mt-1 text-[13px] leading-[1.5] text-muted-foreground">Links, cliques e resultados</p>
@@ -156,21 +156,21 @@ export function LandingPage() {
               <span className="absolute -left-[37px] top-1 size-4 rounded-full border-2 border-primary bg-background" />
               <h3 className="mb-1 text-[20px] font-semibold leading-[1.4] tracking-[-0.01em] text-primary">1. Encurte</h3>
               <p className="text-sm leading-[1.6] text-muted-foreground">
-                Insira sua URL longa ou integre via API para gerar identificadores unicos e persistentes instantaneamente.
+                Insira sua URL longa e gere um identificador curto persistente.
               </p>
             </div>
             <div className="relative">
               <span className="absolute -left-[37px] top-1 size-4 rounded-full border-2 border-muted bg-background" />
               <h3 className="mb-1 text-[20px] font-semibold leading-[1.4] tracking-[-0.01em] text-primary">2. Analise</h3>
               <p className="text-sm leading-[1.6] text-muted-foreground">
-                Monitore o trafego em tempo real no dashboard monolitico, filtrando metricas e referenciadores.
+                Acompanhe cliques, tendências e acessos no dashboard.
               </p>
             </div>
             <div className="relative">
               <span className="absolute -left-[37px] top-1 size-4 rounded-full border-2 border-muted bg-background" />
               <h3 className="mb-1 text-[20px] font-semibold leading-[1.4] tracking-[-0.01em] text-primary">3. Otimize</h3>
               <p className="text-sm leading-[1.6] text-muted-foreground">
-                Ajuste rotas de redirecionamento, atualize destinos sem quebrar link original e refine campanhas com base em dados concretos.
+                Edite configurações, ative ou desative links e use os dados registrados para decidir os próximos passos.
               </p>
             </div>
           </div>
@@ -181,12 +181,9 @@ export function LandingPage() {
       <footer className="mt-auto w-full border-t border-border bg-background py-12">
         <div className="mx-auto flex w-full max-w-content flex-col items-center justify-between gap-4 border-t border-border px-6 pt-8 md:flex-row">
           <div className="text-xs uppercase tracking-[0.12em] text-muted-foreground">© 2026 LinkPulse</div>
-          <nav className="flex gap-6 text-xs uppercase tracking-[0.12em] text-muted-foreground">
-            <span>Privacy</span>
-            <span>Terms</span>
-            <span>Status</span>
-            <span>Docs</span>
-          </nav>
+          <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+            MVP: autenticação, links, redirects e analytics básicos
+          </p>
         </div>
       </footer>
     </main>

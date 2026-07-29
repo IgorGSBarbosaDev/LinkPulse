@@ -28,7 +28,51 @@ export function LinksTable({
           Links management
         </h2>
       </div>
-      <div className="overflow-x-auto">
+      <div className="divide-y divide-border md:hidden">
+        {links.map((link) => (
+          <article className="flex flex-col gap-3 p-4" key={link.id}>
+            <div className="flex min-w-0 items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-foreground">
+                  {getDisplayTitle(link)}
+                </p>
+                <p className="font-mono text-xs text-muted-foreground">
+                  {link.shortCode}
+                </p>
+              </div>
+              <LinkStatusBadge link={link} />
+            </div>
+            <a
+              className="truncate font-mono text-xs text-foreground hover:text-primary hover:underline"
+              href={link.shortUrl}
+              rel="noreferrer"
+              target="_blank"
+            >
+              {link.shortUrl}
+            </a>
+            <div className="flex items-center justify-between gap-3">
+              <span className="inline-flex items-center gap-1.5 font-mono text-sm text-foreground">
+                <Activity aria-hidden="true" className="size-4 text-muted-foreground" />
+                {link.clickCount} clicks
+              </span>
+              <div className="flex items-center gap-1">
+                <Link to={`/links/${link.id}/edit`}>
+                  <Button aria-label="Edit link" size="sm" variant="ghost">
+                    <Edit3 aria-hidden="true" className="size-4" />
+                  </Button>
+                </Link>
+                <CopyShortUrlButton shortUrl={link.shortUrl} />
+                <Link to={`/links/${link.id}/analytics`}>
+                  <Button aria-label="View analytics" size="sm" variant="ghost">
+                    <BarChart3 aria-hidden="true" className="size-4" />
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+      <div className="hidden overflow-x-auto md:block">
         <table className="w-full min-w-[760px] border-collapse text-left">
           <colgroup>
             <col className="w-[30%]" />

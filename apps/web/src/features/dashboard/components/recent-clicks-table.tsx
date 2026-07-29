@@ -38,7 +38,47 @@ export function RecentLinksTable({ links }: RecentLinksTableProps) {
           </Button>
         </Link>
       </div>
-      <div className="overflow-x-auto">
+      <div className="divide-y divide-border md:hidden">
+        {links.map((link) => (
+          <article className="flex flex-col gap-3 p-4" key={link.linkId}>
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-foreground">
+                  {link.title || link.shortCode}
+                </p>
+                <p className="font-mono text-xs text-muted-foreground">
+                  {link.shortCode}
+                </p>
+              </div>
+              <span className={link.active
+                ? 'inline-flex h-6 items-center rounded-md border border-primary bg-surface px-2 font-mono text-xs uppercase tracking-label text-foreground'
+                : 'inline-flex h-6 items-center rounded-md border border-border bg-background px-2 font-mono text-xs uppercase tracking-label text-muted-foreground'}>
+                {link.active ? 'Active' : 'Inactive'}
+              </span>
+            </div>
+            <a
+              className="truncate font-mono text-xs text-foreground hover:text-primary hover:underline"
+              href={link.shortUrl}
+              rel="noreferrer"
+              target="_blank"
+            >
+              {link.shortUrl}
+            </a>
+            <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
+              <span>{formatDateTime(link.lastAccessAt)}</span>
+              <span className="font-mono text-foreground">
+                {new Intl.NumberFormat('en').format(link.clickCount)} clicks
+              </span>
+              <Link to={`/links/${link.linkId}`}>
+                <Button aria-label="View link details" size="sm" variant="ghost">
+                  <Eye aria-hidden="true" className="size-4" />
+                </Button>
+              </Link>
+            </div>
+          </article>
+        ))}
+      </div>
+      <div className="hidden overflow-x-auto md:block">
         <table className="w-full min-w-[780px] border-collapse text-left">
           <thead className="bg-card">
             <tr className="border-b border-border">

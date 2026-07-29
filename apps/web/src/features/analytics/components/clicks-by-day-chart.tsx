@@ -51,7 +51,7 @@ export function ClicksByDayChart({
         </p>
       </div>
       <div className="h-72 px-2 pb-2">
-        <ResponsiveContainer height="100%" width="100%">
+        <ResponsiveContainer height="100%" minHeight={240} minWidth={300} width="100%">
           <AreaChart data={data} margin={{ bottom: 0, left: 6, right: 8, top: 0 }}>
             <CartesianGrid stroke="var(--color-border)" strokeDasharray="3 3" />
             <XAxis

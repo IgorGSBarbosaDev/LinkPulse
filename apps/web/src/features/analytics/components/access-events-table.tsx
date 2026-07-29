@@ -42,7 +42,36 @@ export function AccessEventsTable({
           Latest access events
         </h2>
       </div>
-      <div className="overflow-x-auto">
+      <div className="divide-y divide-border md:hidden">
+        {events.map((event) => (
+          <article className="flex flex-col gap-2 p-4" key={event.id}>
+            <div className="flex items-center justify-between gap-3">
+              <span className="font-mono text-xs text-foreground">
+                {formatDateTime(event.accessedAt)}
+              </span>
+              <span className="font-mono text-xs text-muted-foreground">
+                {displayValue(event.ipAddress)}
+              </span>
+            </div>
+            <p className="line-clamp-2 text-sm text-muted-foreground">
+              {displayValue(event.userAgent)}
+            </p>
+            {event.referer ? (
+              <a
+                className="truncate text-sm text-muted-foreground hover:text-foreground hover:underline"
+                href={event.referer}
+                rel="noreferrer"
+                target="_blank"
+              >
+                {event.referer}
+              </a>
+            ) : (
+              <span className="text-sm text-muted-foreground">Unknown referer</span>
+            )}
+          </article>
+        ))}
+      </div>
+      <div className="hidden overflow-x-auto md:block">
         <table className="w-full min-w-[860px] border-collapse text-left">
           <thead className="bg-card">
             <tr className="border-b border-border">

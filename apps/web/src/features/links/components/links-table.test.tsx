@@ -27,8 +27,12 @@ describe('LinksTable', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.getByText(/backend article/i)).toBeInTheDocument()
-    expect(screen.getByText(/http:\/\/localhost:3000\/r\/backend/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /copy short url/i })).toBeInTheDocument()
+    expect(screen.getAllByText(/backend article/i)).not.toHaveLength(0)
+    expect(
+      screen.getAllByText(/http:\/\/localhost:3000\/r\/backend/i),
+    ).not.toHaveLength(0)
+    expect(
+      screen.getAllByRole('button', { name: /copy short url/i }),
+    ).not.toHaveLength(0)
   })
 })

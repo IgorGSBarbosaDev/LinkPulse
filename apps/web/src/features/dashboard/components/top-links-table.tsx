@@ -26,7 +26,33 @@ export function TopLinksTable({ links }: TopLinksTableProps) {
           Top links
         </h2>
       </div>
-      <div className="overflow-x-auto">
+      <div className="divide-y divide-border md:hidden">
+        {links.map((link) => (
+          <article className="flex items-center justify-between gap-3 p-4" key={link.id}>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-medium text-foreground">
+                {link.title || link.shortCode}
+              </p>
+              <p className="truncate font-mono text-xs text-muted-foreground">
+                {new Intl.NumberFormat('en').format(link.clickCount)} clicks
+              </p>
+            </div>
+            <div className="flex items-center gap-1">
+              <Link to={`/links/${link.id}`}>
+                <Button aria-label="View details" size="sm" variant="ghost">
+                  <Eye aria-hidden="true" className="size-4" />
+                </Button>
+              </Link>
+              <Link to={`/links/${link.id}/analytics`}>
+                <Button aria-label="View analytics" size="sm" variant="ghost">
+                  <BarChart3 aria-hidden="true" className="size-4" />
+                </Button>
+              </Link>
+            </div>
+          </article>
+        ))}
+      </div>
+      <div className="hidden overflow-x-auto md:block">
         <table className="w-full min-w-[620px] border-collapse text-left">
           <thead className="bg-card">
             <tr className="border-b border-border">

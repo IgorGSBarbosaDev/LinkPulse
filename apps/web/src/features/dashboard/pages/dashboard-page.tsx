@@ -1,5 +1,6 @@
 import {
   Activity,
+  CalendarClock,
   MousePointerClick,
 } from 'lucide-react'
 import { useState } from 'react'
@@ -13,6 +14,7 @@ import { PageContainer } from '../../../shared/components/layout/page-container'
 import { Button } from '../../../shared/components/ui/button'
 import { MetricCard } from '../components/metric-card'
 import { RecentLinksTable } from '../components/recent-clicks-table'
+import { TopLinksTable } from '../components/top-links-table'
 import { useDashboard } from '../hooks/use-dashboard'
 import type { DashboardRangePreset } from '../types'
 
@@ -27,15 +29,15 @@ export function DashboardPage() {
   const [range, setRange] = useState<DashboardRangePreset>('3m')
   const dashboardQuery = useDashboard(range)
   const dashboard = dashboardQuery.data
-  const totalLinksLimit = dashboard?.summary.totalLinks ?? 0
+  const totalLinks = dashboard?.summary.totalLinks ?? 0
   const activeLinks = dashboard?.summary.activeLinks ?? 0
   const activeUsagePercent =
-    totalLinksLimit > 0 ? Math.min(100, Math.round((activeLinks / totalLinksLimit) * 100)) : 0
+    totalLinks > 0 ? Math.min(100, Math.round((activeLinks / totalLinks) * 100)) : 0
 
   return (
     <PageContainer
       title="Dashboard"
-      description="General overview of clicks, active links usage, trend, and recent links."
+      description="Overview of clicks, trends, active links, and recent activity."
     >
       <div className="flex flex-col gap-6">
         {dashboardQuery.isLoading ? (
@@ -52,7 +54,7 @@ export function DashboardPage() {
           />
         ) : null}
 
-        {dashboardQuery.isSuccess && dashboardQuery.data.links.length === 0 ? (
+        {dashboardQuery.isSuccess && dashboardQuery.data.summary.totalLinks === 0 ? (
           <EmptyState
             action={
               <Link to="/links/new">
@@ -67,13 +69,23 @@ export function DashboardPage() {
         ) : null}
 
         {dashboard ? (
-          dashboard.links.length > 0 ? (
+          dashboard.summary.totalLinks > 0 ? (
             <>
-              <div className="grid gap-3 md:grid-cols-2">
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 <MetricCard
                   icon={MousePointerClick}
                   label="Total clicks"
                   value={dashboard.summary.totalClicks}
+                />
+                <MetricCard
+                  icon={Activity}
+                  label="Clicks today"
+                  value={dashboard.summary.clicksToday}
+                />
+                <MetricCard
+                  icon={CalendarClock}
+                  label="Last 7 days"
+                  value={dashboard.summary.clicksLast7Days}
                 />
                 <div className="rounded-lg border border-border bg-card px-4 py-3.5">
                   <div className="flex items-start justify-between gap-4">
@@ -85,7 +97,7 @@ export function DashboardPage() {
                         {activeLinks}
                       </span>
                       <span className="font-mono text-xs text-muted-foreground">
-                        Limit {totalLinksLimit}
+                        {totalLinks} total links
                       </span>
                     </div>
                     <span className="rounded-md border border-border bg-surface p-2 text-muted-foreground">
@@ -128,7 +140,10 @@ export function DashboardPage() {
                 </div>
               </div>
 
-              <RecentLinksTable links={dashboard.recentLinks} />
+              <div className="grid gap-6 xl:grid-cols-2">
+                <TopLinksTable links={dashboard.topLinks} />
+                <RecentLinksTable links={dashboard.recentLinks} />
+              </div>
             </>
           ) : null
         ) : null}

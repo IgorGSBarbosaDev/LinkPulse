@@ -1,16 +1,11 @@
-import type {
-  AnalyticsSummary,
-  ClicksByDayItem,
-} from '../analytics/types'
-import type { LinkListItem } from '../links/types'
-
-export type DashboardLink = LinkListItem
-export type DashboardLinkSummary = AnalyticsSummary
+import type { ClicksByDayItem, TopLinkItem } from '../analytics/types'
 
 export type DashboardSummary = {
   totalLinks: number
   totalClicks: number
   activeLinks: number
+  clicksToday: number
+  clicksLast7Days: number
 }
 
 export type DashboardRangePreset = '1m' | '3m' | '6m' | '1y'
@@ -26,9 +21,8 @@ export type DashboardRecentLink = {
 }
 
 export type DashboardData = {
-  links: DashboardLink[]
   summary: DashboardSummary
   clicksByDay: ClicksByDayItem[]
+  topLinks: TopLinkItem[]
   recentLinks: DashboardRecentLink[]
-  isPartial: boolean
 }
