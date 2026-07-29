@@ -1,5 +1,5 @@
 import { AppError } from '../../shared/errors/app-error.js'
-import { hasReachedMaxClicks, isLinkExpired } from '../links/links.mapper.js'
+import { isLinkExpired } from '../links/links.mapper.js'
 import { redirectCacheService } from './redirect-cache.service.js'
 import { redirectsRepository } from './redirects.repository.js'
 import type {
@@ -31,10 +31,6 @@ class RedirectsService {
 
     if (isLinkExpired(link)) {
       throw AppError.gone('Link has expired.')
-    }
-
-    if (dbLink && hasReachedMaxClicks(link)) {
-      throw AppError.gone('Link has reached its maximum number of clicks.')
     }
 
     if (!cachedLink) {

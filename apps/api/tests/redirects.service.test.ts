@@ -82,6 +82,28 @@ describe('redirectsService.resolveRedirect', () => {
     })
   })
 
+  it('lets the repository decide the final max-click boundary', async () => {
+    mockedRedirectsRepository.findRedirectLinkByShortCode.mockResolvedValue({
+      ...baseLink,
+      maxClicks: 3,
+      clickCount: 3,
+    })
+    mockedRedirectsRepository.recordAccessAndIncrementClickCount.mockRejectedValue(
+      AppError.gone('Link is no longer available.'),
+    )
+
+    await expect(
+      redirectsService.resolveRedirect({
+        shortCode: 'abc123',
+        metadata: {},
+      }),
+    ).rejects.toMatchObject({ statusCode: 410 })
+
+    expect(
+      mockedRedirectsRepository.recordAccessAndIncrementClickCount,
+    ).toHaveBeenCalledTimes(1)
+  })
+
   it('uses cache hit and skips database fetch', async () => {
     mockedRedirectCacheService.get.mockResolvedValue({
       id: 'link-id',
@@ -344,6 +366,9 @@ describe('redirectsService.resolveRedirect', () => {
       maxClicks: 2,
       clickCount: 2,
     })
+    mockedRedirectsRepository.recordAccessAndIncrementClickCount.mockRejectedValue(
+      AppError.gone('Link is no longer available.'),
+    )
 
     await expect(
       redirectsService.resolveRedirect({
@@ -361,6 +386,6 @@ describe('redirectsService.resolveRedirect', () => {
 
     expect(
       mockedRedirectsRepository.recordAccessAndIncrementClickCount,
-    ).not.toHaveBeenCalled()
+    ).toHaveBeenCalledTimes(1)
   })
 })
