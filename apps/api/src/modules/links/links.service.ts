@@ -26,14 +26,22 @@ function generateShortCode(length = SHORT_CODE_LENGTH): string {
 }
 
 function normalizeUrl(url: string): string {
-  return new URL(url.trim()).toString()
+  let parsedUrl: URL
+
+  try {
+    parsedUrl = new URL(url.trim())
+  } catch {
+    throw AppError.badRequest('Original URL must be valid.')
+  }
+
+  if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+    throw AppError.badRequest('Original URL must use HTTP or HTTPS.')
+  }
+
+  return parsedUrl.toString()
 }
 
 function toDateOrNull(value: Date | string | null): Date | null {
-  if (value === null) {
-    return null
-  }
-
   if (value === null) {
     return null
   }

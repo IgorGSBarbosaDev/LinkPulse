@@ -36,6 +36,24 @@ describe('link schemas', () => {
     expect(result.error?.flatten().fieldErrors.maxClicks).toBeDefined()
   })
 
+  it.each([
+    'javascript:alert(1)',
+    'data:text/html,<script>alert(1)</script>',
+    'ftp://example.com/file',
+  ])('blocks non-HTTP URL %s', (originalUrl) => {
+    const result = createLinkSchema.safeParse({
+      originalUrl,
+      customAlias: '',
+      title: '',
+      description: '',
+      expiresAt: '',
+      maxClicks: '',
+    })
+
+    expect(result.success).toBe(false)
+    expect(result.error?.flatten().fieldErrors.originalUrl).toBeDefined()
+  })
+
   it('accepts valid edit link values', () => {
     const result = editLinkSchema.safeParse({
       title: 'Updated title',

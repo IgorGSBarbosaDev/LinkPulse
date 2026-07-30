@@ -7,7 +7,7 @@ const customAliasSchema = z
   .max(50, 'The alias must have at most 50 characters.')
   .regex(
     /^[a-zA-Z0-9_-]+$/,
-    'Must contains only letters, numbers, underscores or hyphens.',
+    'Must contain only letters, numbers, underscores or hyphens.',
   )
   .transform((value) => value.toLowerCase())
 
@@ -15,7 +15,7 @@ const optionalTextSchema = (max: number, fieldName: string) =>
   z
     .string()
     .trim()
-    .min(1, `${fieldName} cant be empty.`)
+    .min(1, `${fieldName} can't be empty.`)
     .max(max, `${fieldName} must have at most ${max} characters.`)
 
 const futureDateSchema = z.coerce
@@ -26,6 +26,22 @@ const futureDateSchema = z.coerce
     message: 'Expiration date must be a future date.',
   })
 
+function isHttpUrl(value: string) {
+  try {
+    const protocol = new URL(value).protocol
+
+    return protocol === 'http:' || protocol === 'https:'
+  } catch {
+    return false
+  }
+}
+
+const httpUrlSchema = z
+  .string()
+  .trim()
+  .url('Informe uma URL válida.')
+  .refine(isHttpUrl, 'A URL deve usar HTTP ou HTTPS.')
+
 const activeQuerySchema = z
   .enum(['true', 'false'])
   .transform((value) => value === 'true')
@@ -33,10 +49,7 @@ const activeQuerySchema = z
 
 export const createLinkSchema = z.object({
   body: z.object({
-    originalUrl: z
-      .string()
-      .trim()
-      .url('Informe uma URL válida.'),
+    originalUrl: httpUrlSchema,
 
     customAlias: customAliasSchema.optional(),
 
@@ -61,11 +74,7 @@ export const updateLinkSchema = z.object({
 
   body: z
     .object({
-      originalUrl: z
-        .string()
-        .trim()
-        .url('Informe uma URL válida.')
-        .optional(),
+      originalUrl: httpUrlSchema.optional(),
 
       customAlias: customAliasSchema.optional(),
 

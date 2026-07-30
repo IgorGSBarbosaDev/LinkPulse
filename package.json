@@ -1,7 +1,7 @@
 {
   "name": "linkpulse",
   "version": "1.0.0",
-  "description": "",
+  "description": "Fullstack URL shortener with JWT authentication and click analytics.",
   "main": "index.js",
   "directories": {
     "doc": "docs"
@@ -21,11 +21,20 @@
     "prisma:migrate": "npm run prisma:migrate -w apps/api",
     "prisma:studio": "npm run prisma:studio -w apps/api"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "url-shortener",
+    "analytics",
+    "typescript",
+    "react",
+    "express",
+    "prisma",
+    "redis",
+    "postgresql"
+  ],
+  "author": "IgorGSBarbosaDev",
   "license": "ISC",
   "type": "commonjs",
-  "private": "true",
+  "private": true,
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -33,10 +42,10 @@
   "devDependencies": {
     "@playwright/test": "^1.62.0",
     "@vitest/coverage-v8": "^4.1.10",
-    "concurrently": "^9.2.1"
+    "concurrently": "^9.2.4"
   },
   "dependencies": {
-    "@prisma/adapter-pg": "^7.8.0",
-    "pg": "^8.20.0"
+    "@prisma/adapter-pg": "^7.9.1",
+    "pg": "^8.22.0"
   }
 }
