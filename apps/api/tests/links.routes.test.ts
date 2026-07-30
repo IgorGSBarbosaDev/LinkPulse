@@ -82,4 +82,26 @@ describe('POST /api/v1/links', () => {
     expect(createMock).not.toHaveBeenCalled()
   })
 
+  it.each([
+    'javascript:alert(1)',
+    'data:text/html,<script>alert(1)</script>',
+    'ftp://example.com/file',
+  ])('rejects non-HTTP URL %s', async (originalUrl) => {
+    const { app } = await import('../src/app.js')
+    const token = buildToken()
+
+    const response = await request(app)
+      .post('/api/v1/links')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ originalUrl })
+
+    expect(response.status).toBe(400)
+    expect(response.body.details).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ field: 'body.originalUrl' }),
+      ]),
+    )
+    expect(createMock).not.toHaveBeenCalled()
+  })
+
 })

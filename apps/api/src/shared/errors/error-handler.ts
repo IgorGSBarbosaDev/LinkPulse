@@ -48,6 +48,8 @@ export function errorHandler(
     res: Response,
     _next: NextFunction,
 ): Response {
+    void _next
+
     if (error instanceof AppError) {
         if (shouldRenderRedirectErrorPage(req)) {
             return sendRedirectErrorPage(req, res, error.statusCode)

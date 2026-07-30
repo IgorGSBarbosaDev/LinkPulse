@@ -29,6 +29,16 @@ function formatNumber(value: number | null) {
   return new Intl.NumberFormat('en').format(value)
 }
 
+function isSafeHttpUrl(value: string) {
+  try {
+    const protocol = new URL(value).protocol
+
+    return protocol === 'http:' || protocol === 'https:'
+  } catch {
+    return false
+  }
+}
+
 function DetailItem({
   label,
   value,
@@ -125,15 +135,21 @@ export function LinkDetailsCard({ link }: LinkDetailsCardProps) {
           <span className="text-xs font-medium uppercase tracking-label text-muted-foreground">
             Original URL
           </span>
-          <a
-            className="break-all text-sm leading-6 text-foreground hover:underline"
-            href={link.originalUrl}
-            rel="noreferrer"
-            target="_blank"
-          >
-            {link.originalUrl}
-            <ExternalLink aria-hidden="true" className="ml-2 inline size-4" />
-          </a>
+          {isSafeHttpUrl(link.originalUrl) ? (
+            <a
+              className="break-all text-sm leading-6 text-foreground hover:underline"
+              href={link.originalUrl}
+              rel="noreferrer"
+              target="_blank"
+            >
+              {link.originalUrl}
+              <ExternalLink aria-hidden="true" className="ml-2 inline size-4" />
+            </a>
+          ) : (
+            <span className="break-all text-sm leading-6 text-muted-foreground">
+              {link.originalUrl}
+            </span>
+          )}
         </div>
       </div>
 

@@ -31,12 +31,25 @@ const optionalMaxClicksSchema = z
     message: 'Max clicks must be greater than zero',
   })
 
+function isHttpUrl(value: string) {
+  try {
+    const protocol = new URL(value).protocol
+
+    return protocol === 'http:' || protocol === 'https:'
+  } catch {
+    return false
+  }
+}
+
+const httpUrlSchema = z
+  .string()
+  .trim()
+  .min(1, 'Original URL is required')
+  .url('Enter a valid URL')
+  .refine(isHttpUrl, 'URL must use HTTP or HTTPS')
+
 export const createLinkSchema = z.object({
-  originalUrl: z
-    .string()
-    .trim()
-    .min(1, 'Original URL is required')
-    .url('Enter a valid URL'),
+  originalUrl: httpUrlSchema,
   customAlias: z
     .string()
     .trim()
