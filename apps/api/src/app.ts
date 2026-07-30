@@ -7,7 +7,11 @@ import dotenv from 'dotenv'
 
 import { errorHandler } from './shared/errors/error-handler.js'
 import { notFoundMiddleware } from './shared/middlewares/not-found.middleware.js'
-import { swaggerServe, swaggerSetup } from './shared/config/swagger.js'
+import {
+  openApiSpec,
+  swaggerServe,
+  swaggerSetup,
+} from './shared/config/swagger.js'
 import { prisma } from './shared/config/prisma.js'
 import { redis } from './shared/config/redis.js'
 import { env } from './shared/config/env.js'
@@ -58,6 +62,9 @@ app.use(
 
 app.use(express.json())
 app.use('/docs', swaggerServe, swaggerSetup)
+app.get('/docs.json', (_req, res) => {
+  res.json(openApiSpec)
+})
 
 app.get('/health', async (_req, res) => {
   let postgres: 'up' | 'down' = 'up'

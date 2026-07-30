@@ -11,6 +11,29 @@ describe('app base routes', () => {
     expect(response.headers.location).toBe('/docs/')
   })
 
+  it('returns the OpenAPI document as JSON', async () => {
+    const { app } = await import('../src/app.js')
+
+    const response = await request(app).get('/docs.json')
+
+    expect(response.status).toBe(200)
+    expect(response.headers['content-type']).toMatch(/application\/json/)
+    expect(response.body).toMatchObject({
+      openapi: '3.0.3',
+      info: { title: 'LinkPulse API' },
+      components: {
+        securitySchemes: {
+          BearerAuth: {
+            type: 'http',
+            scheme: 'bearer',
+          },
+        },
+      },
+    })
+    expect(response.body.paths).toHaveProperty('/health')
+    expect(response.body.paths).toHaveProperty('/api/v1/analytics/dashboard')
+  })
+
   it('returns health payload with dependencies', async () => {
     const { app } = await import('../src/app.js')
 

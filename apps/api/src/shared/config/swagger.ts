@@ -1,17 +1,19 @@
 import swaggerJSDoc from 'swagger-jsdoc'
 import swaggerUi from 'swagger-ui-express'
+import { env } from './env.js'
 
 const swaggerDefinition = {
   openapi: '3.0.3',
   info: {
     title: 'LinkPulse API',
-    version: '1.0.0',
-    description: 'Short links and analytics API documentation.',
+    version: env.APP_VERSION,
+    description:
+      'API for authentication, short-link management, public redirects, click tracking, and analytics.',
   },
   servers: [
     {
-      url: 'http://localhost:3000',
-      description: 'Local',
+      url: env.APP_BASE_URL,
+      description: 'Configured application server',
     },
   ],
   tags: [
@@ -19,6 +21,7 @@ const swaggerDefinition = {
     { name: 'Links' },
     { name: 'Redirect' },
     { name: 'Analytics' },
+    { name: 'Health' },
   ],
   components: {
     securitySchemes: {
@@ -47,6 +50,8 @@ const swaggerDefinition = {
             type: 'array',
             items: { $ref: '#/components/schemas/ValidationErrorDetail' },
           },
+          code: { type: 'string', example: 'RATE_LIMITED' },
+          requestId: { type: 'string', format: 'uuid' },
         },
         required: ['statusCode', 'error', 'message', 'details'],
       },
@@ -103,7 +108,7 @@ const swaggerDefinition = {
           originalUrl: { type: 'string', format: 'uri' },
           shortCode: { type: 'string', example: 'Ab3dE9x' },
           customAlias: { type: 'string', nullable: true, example: 'promo_2026' },
-          shortUrl: { type: 'string', format: 'uri', example: 'http://localhost:3000/r/Ab3dE9x' },
+          shortUrl: { type: 'string', format: 'uri', example: `${env.APP_BASE_URL}/r/Ab3dE9x` },
           title: { type: 'string', nullable: true, example: 'Campaign Landing' },
           description: { type: 'string', nullable: true, example: 'Main campaign link' },
           active: { type: 'boolean', example: true },
@@ -215,10 +220,118 @@ const swaggerDefinition = {
           id: { type: 'string', format: 'uuid' },
           title: { type: 'string', nullable: true, example: 'Campaign Landing' },
           shortCode: { type: 'string', example: 'Ab3dE9x' },
-          shortUrl: { type: 'string', format: 'uri', example: 'http://localhost:3000/r/Ab3dE9x' },
+          shortUrl: { type: 'string', format: 'uri', example: `${env.APP_BASE_URL}/r/Ab3dE9x` },
           clickCount: { type: 'integer', example: 2711 },
         },
         required: ['id', 'title', 'shortCode', 'shortUrl', 'clickCount'],
+      },
+      DashboardSummary: {
+        type: 'object',
+        properties: {
+          totalLinks: { type: 'integer', example: 4 },
+          totalClicks: { type: 'integer', example: 120 },
+          activeLinks: { type: 'integer', example: 3 },
+          clicksToday: { type: 'integer', example: 12 },
+          clicksLast7Days: { type: 'integer', example: 84 },
+        },
+        required: [
+          'totalLinks',
+          'totalClicks',
+          'activeLinks',
+          'clicksToday',
+          'clicksLast7Days',
+        ],
+      },
+      DashboardRecentLink: {
+        type: 'object',
+        properties: {
+          linkId: { type: 'string', format: 'uuid' },
+          shortCode: { type: 'string', example: 'Ab3dE9x' },
+          shortUrl: { type: 'string', format: 'uri', example: `${env.APP_BASE_URL}/r/Ab3dE9x` },
+          title: { type: 'string', nullable: true, example: 'Campaign Landing' },
+          active: { type: 'boolean', example: true },
+          clickCount: { type: 'integer', example: 120 },
+          lastAccessAt: { type: 'string', format: 'date-time' },
+        },
+        required: [
+          'linkId',
+          'shortCode',
+          'shortUrl',
+          'title',
+          'active',
+          'clickCount',
+          'lastAccessAt',
+        ],
+      },
+      DashboardResponse: {
+        type: 'object',
+        properties: {
+          summary: { $ref: '#/components/schemas/DashboardSummary' },
+          clicksByDay: {
+            type: 'array',
+            items: { $ref: '#/components/schemas/ClicksByDayItem' },
+          },
+          topLinks: {
+            type: 'array',
+            items: { $ref: '#/components/schemas/TopLink' },
+          },
+          recentLinks: {
+            type: 'array',
+            items: { $ref: '#/components/schemas/DashboardRecentLink' },
+          },
+        },
+        required: ['summary', 'clicksByDay', 'topLinks', 'recentLinks'],
+      },
+      HealthResponse: {
+        type: 'object',
+        properties: {
+          status: { type: 'string', enum: ['ok', 'degraded', 'down'], example: 'ok' },
+          app: { type: 'string', example: 'LinkPulse API' },
+          timestamp: { type: 'string', format: 'date-time' },
+          uptimeSeconds: { type: 'integer', example: 42 },
+          version: { type: 'string', example: '0.1.0' },
+          requestId: { type: 'string', nullable: true, example: 'b6d9e8b2-2dbd-4d89-8ce1-7a9af5c21d9c' },
+          dependencies: {
+            type: 'object',
+            properties: {
+              postgres: { type: 'string', enum: ['up', 'down'] },
+              redis: { type: 'string', enum: ['up', 'down'] },
+            },
+            required: ['postgres', 'redis'],
+          },
+          checks: {
+            type: 'object',
+            properties: {
+              postgres: {
+                type: 'object',
+                properties: {
+                  status: { type: 'string', enum: ['up', 'down'] },
+                  latencyMs: { type: 'integer', minimum: 0, example: 3 },
+                },
+                required: ['status', 'latencyMs'],
+              },
+              redis: {
+                type: 'object',
+                properties: {
+                  status: { type: 'string', enum: ['up', 'down'] },
+                  latencyMs: { type: 'integer', minimum: 0, example: 1 },
+                },
+                required: ['status', 'latencyMs'],
+              },
+            },
+            required: ['postgres', 'redis'],
+          },
+        },
+        required: [
+          'status',
+          'app',
+          'timestamp',
+          'uptimeSeconds',
+          'version',
+          'requestId',
+          'dependencies',
+          'checks',
+        ],
       },
     },
     responses: {
@@ -347,6 +460,34 @@ const swaggerDefinition = {
           400: { $ref: '#/components/responses/ValidationError' },
           401: { $ref: '#/components/responses/UnauthorizedError' },
           429: { $ref: '#/components/responses/RateLimitError' },
+        },
+      },
+      GoneError: {
+        description: 'The resource is no longer available',
+        content: {
+          'application/json': {
+            schema: { $ref: '#/components/schemas/ApiError' },
+            example: {
+              statusCode: 410,
+              error: 'Gone',
+              message: 'Link is inactive.',
+              details: [],
+            },
+          },
+        },
+      },
+      InternalServerError: {
+        description: 'Unexpected server error',
+        content: {
+          'application/json': {
+            schema: { $ref: '#/components/schemas/ApiError' },
+            example: {
+              statusCode: 500,
+              error: 'Internal Server Error',
+              message: 'An unexpected internal server error',
+              details: [],
+            },
+          },
         },
       },
     },
@@ -559,9 +700,11 @@ const swaggerDefinition = {
               },
             },
           },
-          404: { $ref: '#/components/responses/NotFoundError' },
-          429: { $ref: '#/components/responses/RateLimitError' },
-        },
+            404: { $ref: '#/components/responses/NotFoundError' },
+            410: { $ref: '#/components/responses/GoneError' },
+            429: { $ref: '#/components/responses/RateLimitError' },
+            500: { $ref: '#/components/responses/InternalServerError' },
+          },
       },
     },
     '/api/v1/links/{id}/analytics/summary': {
@@ -672,6 +815,57 @@ const swaggerDefinition = {
         },
       },
     },
+    '/api/v1/analytics/dashboard': {
+      get: {
+        tags: ['Analytics'],
+        summary: 'Get aggregated analytics dashboard',
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          {
+            name: 'range',
+            in: 'query',
+            description: 'Date range used for dashboard clicks by day.',
+            schema: { type: 'string', enum: ['1m', '3m', '6m', '1y'], default: '3m' },
+          },
+        ],
+        responses: {
+          200: {
+            description: 'Success',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/DashboardResponse' },
+              },
+            },
+          },
+          400: { $ref: '#/components/responses/ValidationError' },
+          401: { $ref: '#/components/responses/UnauthorizedError' },
+        },
+      },
+    },
+    '/health': {
+      get: {
+        tags: ['Health'],
+        summary: 'Check API and dependencies health',
+        responses: {
+          200: {
+            description: 'API and PostgreSQL/Redis are available',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/HealthResponse' },
+              },
+            },
+          },
+          503: {
+            description: 'PostgreSQL is unavailable',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/HealthResponse' },
+              },
+            },
+          },
+        },
+      },
+    },
   },
 } as const
 
@@ -681,4 +875,8 @@ export const openApiSpec = swaggerJSDoc({
 })
 
 export const swaggerServe = swaggerUi.serve
-export const swaggerSetup = swaggerUi.setup(openApiSpec)
+export const swaggerSetup = swaggerUi.setup(openApiSpec, {
+  swaggerOptions: {
+    persistAuthorization: true,
+  },
+})

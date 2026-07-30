@@ -137,7 +137,6 @@ Se o banco de testes já existir, a mensagem de banco duplicado pode ser ignorad
 ### Migrations e preparação do banco
 
 Gere o Prisma Client e aplique as migrations do banco de desenvolvimento:
-
 ```powershell
 npm run prisma:generate
 npm run prisma:migrate
@@ -174,6 +173,18 @@ Endereços locais:
 - Health check: <http://localhost:3000/health>
 - Swagger UI: <http://localhost:3000/docs>
 - Web: <http://localhost:5173>
+
+### Swagger/OpenAPI
+
+A documentação interativa fica disponível em `/docs` e a especificação bruta em `/docs.json`.
+Para testar rotas protegidas:
+
+1. Execute `POST /api/v1/auth/login` em `/docs` com o e-mail e a senha da conta.
+2. Copie o valor de `accessToken` retornado, sem o prefixo `Bearer`.
+3. Clique em `Authorize`, cole o token no campo `BearerAuth` e confirme.
+4. Execute as operações protegidas; o Swagger enviará automaticamente `Authorization: Bearer <token>`.
+
+O endereço do servidor exibido pelo Swagger é derivado de `APP_BASE_URL` em `apps/api/.env`, permitindo usar a mesma documentação no desenvolvimento e no build de produção.
 
 ## Comandos
 
